@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading">
+  <div><h1>Review queue</h1><p>{{ cases|length }} matching cases</p></div>
+</div>
+<form class="filters" method="get">
+  <input name="q" value="{{ request.args.get('q', '') }}" placeholder="Patient or case ID">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for value in ["pending", "in_review", "needs_changes", "approved"] %}
+      <option value="{{ value }}" {% if request.args.get('status') == value %}selected{% endif %}>{{ value|replace("_", " ") }}</option>
+    {% endfor %}
+  </select>
+  <select name="assigned">
+    <option value="">Any reviewer</option>
+    <option value="me" {% if request.args.get('assigned') == 'me' %}selected{% endif %}>Assigned to me</option>
+    <option value="unassigned" {% if request.args.get('assigned') == 'unassigned' %}selected{% endif %}>Unassigned</option>
+    {% for reviewer in reviewers %}
+      <option value="{{ reviewer.id }}" {% if request.args.get('assigned') == reviewer.id|string %}selected{% endif %}>{{ reviewer.display_name }}</option>
+    {% endfor %}
+  </select>
+  <select name="holdout">
+    <option value="">Training and holdout</option>
+    <option value="no" {% if request.args.get('holdout') == 'no' %}selected{% endif %}>Training eligible</option>
+    <option value="yes" {% if request.args.get('holdout') == 'yes' %}selected{% endif %}>Holdout only</option>
+  </select>
+  <button type="submit">Filter</button>
+</form>
+<div class="case-grid">
+  {% for record in cases %}
+    <a class="case-card" href="{{ url_for('review.case_overview', record_id=record.id) }}">
+      <div class="card-row">
+        <strong>{{ record.patient_folder }}</strong>
+        <span class="badge {{ record.status }}">{{ record.status|replace("_", " ") }}</span>
+      </div>
+      <small>{{ record.case_id }}</small>
+      <div class="meta">
+        <span>{{ record.visit_count }} visits</span>
+        <span>{{ record.split or "unsplit" }}</span>
+        {% if record.is_holdout %}<span class="badge holdout">golden holdout</span>{% endif %}
+      </div>
+      <div class="meta">Reviewer: {{ record.assigned_user.display_name if record.assigned_user else "unassigned" }}</div>
+    </a>
+  {% else %}
+    <div class="empty">No cases match these filters. Run <code>flask index-cases</code> if the queue is empty.</div>
+  {% endfor %}
+</div>
+{% endblock %}

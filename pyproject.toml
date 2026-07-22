@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "collabvet-review-app"
+version = "0.1.0"
+description = "Local clinician review workflow for Collab.Vet longitudinal cases"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask",
+    "Flask-Login",
+    "Flask-SQLAlchemy",
+    "Flask-WTF",
+    "PyJWT[crypto]",
+    "jsonpatch",
+    "pymupdf>=1.24",
+    "python-dotenv>=1.0",
+    "waitress",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4"]
+
+[project.scripts]
+collabvet-review = "collabvet_review_app.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+[tool.ruff]
+line-length = 100

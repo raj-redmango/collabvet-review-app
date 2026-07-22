@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+data/review_app/
+data/review_inputs/
+data/teacher/
+data/source_documents/
+data/review_demo/
+config/v04_approved_train_manifest.json

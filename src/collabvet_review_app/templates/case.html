@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}{{ record.patient_folder }} · Review{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <a href="{{ url_for('review.queue') }}">← Queue</a>
+    <h1>{{ record.patient_folder }}</h1>
+    <p>{{ record.case_id }} · revision {{ record.current_revision }}</p>
+  </div>
+  <div class="actions">
+    {% if record.is_holdout %}<span class="badge holdout">golden holdout — never train</span>{% endif %}
+    <form class="assignment-form" method="post" action="{{ url_for('review.assign_case', record_id=record.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <select name="assignee_id" aria-label="Assign reviewer">
+        <option value="">Unassigned</option>
+        {% for reviewer in reviewers %}
+          <option value="{{ reviewer.id }}" {% if record.assigned_user_id == reviewer.id %}selected{% endif %}>{{ reviewer.display_name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Assign</button>
+    </form>
+    <a class="button" href="{{ url_for('review.approve_case', record_id=record.id) }}">Sign-off / export</a>
+  </div>
+</div>
+
+<div class="summary-grid">
+  <section class="panel">
+    <h2>Overview</h2>
+    {% set sig = case.get("signalment", {}) %}
+    <dl>
+      <dt>Patient</dt><dd>{{ sig.get("pet_name", record.patient_folder) }}</dd>
+      <dt>Signalment</dt><dd>{{ [sig.get("species"), sig.get("breed"), sig.get("age"), sig.get("sex")]|select|join(", ") }}</dd>
+      <dt>Status</dt><dd>{{ record.status|replace("_", " ") }}</dd>
+      <dt>Reviewer</dt><dd>{{ record.assigned_user.display_name if record.assigned_user else "Unassigned" }}</dd>
+      <dt>Source hash</dt><dd><code>{{ record.source_hash[:16] }}…</code></dd>
+    </dl>
+    <h3>Source documents</h3>
+    {% for kind, path in documents.items() %}
+      <a class="button secondary" target="_blank" href="{{ url_for('review.source_document', record_id=record.id, kind=kind) }}">{{ kind|replace("_", " ") }}</a>
+    {% else %}<p class="muted">No allowlisted sources resolved.</p>{% endfor %}
+  </section>
+
+  <section class="panel">
+    <h2>Validation</h2>
+    {% if issues %}
+      <ul class="issue-list">
+        {% for issue in issues %}
+          <li class="{{ issue.severity }}"><strong>{{ issue.severity }}</strong> <code>{{ issue.path }}</code> {{ issue.message }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="success-text">Schema checks pass.</p>{% endif %}
+    <p>Each applicable training stage requires a separate clinician sign-off.</p>
+  </section>
+</div>
+
+<section class="panel">
+  {% set approved_events = timeline|selectattr("status", "equalto", "approved")|list|length %}
+  <div class="card-row">
+    <div>
+      <h2>Timeline review</h2>
+      <p>Work from top to bottom: verify what was known, what happened, and what changed over time.</p>
+    </div>
+    <strong>{{ approved_events }} / {{ timeline|length }} events verified</strong>
+  </div>
+  <div class="timeline-filters" role="group" aria-label="Timeline filters">
+    <button type="button" class="secondary active" data-timeline-filter="all">All</button>
+    <button type="button" class="secondary" data-timeline-filter="pending">Still to review</button>
+    <button type="button" class="secondary" data-timeline-filter="needs_changes">Needs changes</button>
+  </div>
+  <ol class="review-timeline">
+    {% for event in timeline %}
+      <li class="timeline-event" data-review-status="{{ event.status }}">
+        <article class="timeline-card">
+          <div class="card-row">
+            <div>
+              <strong>{{ event.date }}</strong>
+              <span class="event-type">{{ event.title }}</span>
+            </div>
+            <span class="badge {{ event.status }}">{{ event.status|replace("_", " ") }}</span>
+          </div>
+          {% if event.summary %}<p>{{ event.summary }}</p>{% endif %}
+          <nav class="timeline-actions" aria-label="{{ event.title }} review actions">
+            {% for section_key, label in event.links %}
+              <a class="button secondary" href="{{ url_for('review.review_section', record_id=record.id, section_key=section_key) }}">{{ label }}</a>
+            {% endfor %}
+            {% if event.document_kind in documents %}
+              {% set page = event.source_pages[0] if event.source_pages else none %}
+              <a class="source-link" target="_blank" href="{{ url_for('review.source_document', record_id=record.id, kind=event.document_kind) }}{% if page %}#page={{ page }}{% endif %}">
+                Source{% if page %} · page {{ page }}{% endif %}
+              </a>
+            {% endif %}
+          </nav>
+          {% if event.stages %}
+            <div class="stage-markers">
+              <span>Training checkpoints:</span>
+              {% for stage in event.stages %}
+                {% set stage_review = reviews.get("stage:" ~ stage) %}
+                <a href="{{ url_for('review.stage_preview', record_id=record.id, stage=stage) }}">
+                  Stage {{ stage }}
+                  <span class="badge {{ stage_review.status if stage_review else 'pending' }}">{{ stage_review.status|replace("_", " ") if stage_review else "pending" }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </article>
+      </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<section class="panel">
+  <h2>Training-stage verification</h2>
+  <p>After the timeline is correct, verify the exact system instruction, model input, and expected output for every applicable stage.</p>
+  <div class="section-list">
+    {% for stage in ["A", "B", "C", "D"] %}
+      {% if stage != "D" or stage_examples.get("D") %}
+        {% set review = reviews.get("stage:" ~ stage) %}
+        <a href="{{ url_for('review.stage_preview', record_id=record.id, stage=stage) }}">
+          <span>
+            Stage {{ stage }}
+            {% if stage == "A" and not stage_examples.get("A") %} · artifact missing{% endif %}
+            {% if stage == "D" %} · {{ stage_examples.get("D")|length }} follow-up example(s){% endif %}
+          </span>
+          <span class="badge {{ review.status if review else 'pending' }}">{{ review.status|replace("_", " ") if review else "pending" }}</span>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<details class="panel">
+  <summary><strong>All review fields</strong> · use when you need direct section access</summary>
+  <div class="section-list details-content">
+    {% for section in sections %}
+      {% set review = reviews.get(section) %}
+      <a href="{{ url_for('review.review_section', record_id=record.id, section_key=section) }}">
+        <span>{{ section|replace(":", " · ")|replace("_", " ") }}</span>
+        <span class="badge {{ review.status if review else 'pending' }}">{{ review.status|replace("_", " ") if review else "pending" }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</details>
+
+<section class="panel">
+  <h2>Comments</h2>
+  {% for comment in comments %}
+    <article class="comment {% if comment.blocking and not comment.resolved %}blocking{% endif %}">
+      <strong>{{ comment.section_key }}</strong> · {{ comment.author.display_name }}
+      {% if comment.blocking %}<span class="badge holdout">blocking</span>{% endif %}
+      {% if comment.resolved %}<span class="badge approved">resolved</span>{% endif %}
+      <p>{{ comment.body }}</p>
+      {% if not comment.resolved %}
+        <form method="post" action="{{ url_for('review.resolve_comment', comment_id=comment.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="secondary" type="submit">Resolve</button>
+        </form>
+      {% endif %}
+    </article>
+  {% endfor %}
+  <form method="post" action="{{ url_for('review.add_comment', record_id=record.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Section <input name="section_key" value="case"></label>
+    <label>Comment <textarea name="body" required></textarea></label>
+    <label class="checkbox"><input type="checkbox" name="blocking"> Blocks approval</label>
+    <button type="submit">Add comment</button>
+  </form>
+</section>
+{% endblock %}

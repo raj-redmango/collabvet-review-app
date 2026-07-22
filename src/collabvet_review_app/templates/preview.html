@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Stage {{ stage }} preview{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <a href="{{ url_for('review.case_overview', record_id=record.id) }}">← Case</a>
+    <h1>Training verification · Stage {{ stage }}</h1>
+    <p>Revision {{ record.current_revision }}</p>
+  </div>
+  <span class="badge {{ review.status if review else 'pending' }}">{{ review.status if review else "pending" }}</span>
+</div>
+
+{% if stage == "A" and not examples %}
+  <section class="panel">
+    <h2>Stage A artifact missing</h2>
+    <p class="warning">No teacher gap-analysis artifact was found for this case. Stage A cannot be approved, and final case approval remains blocked.</p>
+  </section>
+{% else %}
+  <section class="panel">
+    <h2>System instruction</h2>
+    <pre class="preview">{{ system_prompt }}</pre>
+  </section>
+  {% for example in examples %}
+    <section class="panel">
+      <h2>{{ example.example_id }}</h2>
+      {% if example.visit_id %}<p>Visit: {{ example.visit_id }}</p>{% endif %}
+      <div class="summary-grid">
+        <div>
+          <h3>Model input</h3>
+          <pre class="preview">{{ example.case_file }}</pre>
+        </div>
+        <div>
+          <h3>Expected output</h3>
+          <pre class="preview">{{ example.expected_output }}</pre>
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+{% endif %}
+
+<section class="panel">
+  <h2>Stage decision</h2>
+  <form method="post" action="{{ url_for('review.section_status', record_id=record.id, section_key='stage:' ~ stage) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="base_revision" value="{{ record.current_revision }}">
+    <label>Status
+      <select name="status">
+        {% for value in ["pending", "approved", "needs_changes"] %}
+          {% if not (stage == "A" and not examples and value == "approved") %}
+            <option value="{{ value }}" {% if review and review.status == value %}selected{% endif %}>{{ value|replace("_", " ") }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </label>
+    <label>Clinician note
+      <textarea name="comment" placeholder="Document discrepancies or why this stage is ready for training.">{{ review.comment if review else "" }}</textarea>
+    </label>
+    <button type="submit">Update stage decision</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% macro render_fields(value, path, label="") %}
+  {% if value is mapping %}
+    <fieldset>
+      {% if label %}<legend>{{ label }}</legend>{% endif %}
+      {% for key, child in value.items() %}
+        {% set escaped = key|string|replace("~", "~0")|replace("/", "~1") %}
+        {{ render_fields(child, path ~ "/" ~ escaped, key|string|replace("_", " ")) }}
+      {% endfor %}
+    </fieldset>
+  {% elif value is sequence and value is not string %}
+    <fieldset>
+      {% if label %}<legend>{{ label }}</legend>{% endif %}
+      {% for child in value %}
+        {{ render_fields(child, path ~ "/" ~ loop.index0, "Item " ~ loop.index) }}
+      {% else %}<p class="muted">Empty array — use raw JSON to add items.</p>{% endfor %}
+    </fieldset>
+  {% else %}
+    <label>
+      <span>{{ label or path }}</span>
+      {% if value is boolean %}
+        <select name="field|{{ path }}">
+          <option value="true" {% if value %}selected{% endif %}>true</option>
+          <option value="false" {% if not value %}selected{% endif %}>false</option>
+        </select>
+      {% else %}
+        <textarea name="field|{{ path }}" rows="{{ 5 if value|string|length > 180 else 2 }}">{{ "" if value is none else value }}</textarea>
+      {% endif %}
+    </label>
+  {% endif %}
+{% endmacro %}
+{% block title %}{{ section_key }} · {{ record.patient_folder }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <a href="{{ url_for('review.case_overview', record_id=record.id) }}">← {{ record.patient_folder }}</a>
+    <h1>{{ section_key|replace(":", " · ")|replace("_", " ") }}</h1>
+    <p>Revision {{ record.current_revision }} · edits autosave only when you press Save changes</p>
+  </div>
+  <span class="badge {{ review.status if review else 'pending' }}">{{ review.status if review else "pending" }}</span>
+</div>
+
+<div class="split-review">
+  <section class="source-pane">
+    <nav class="source-tabs">
+      {% for kind, path in documents.items() %}
+        <button type="button" data-document-url="{{ url_for('review.source_document', record_id=record.id, kind=kind) }}">{{ kind|replace("_", " ") }}</button>
+      {% endfor %}
+    </nav>
+    {% if documents %}
+      <iframe id="source-frame" title="Source document" src="{{ url_for('review.source_document', record_id=record.id, kind=(documents.keys()|list)[0]) }}"></iframe>
+    {% else %}
+      <div class="empty">No source document was resolved inside the configured allowlist.</div>
+    {% endif %}
+  </section>
+
+  <section class="editor-pane">
+    {% if section is mapping and (section.get("source_page") or section.get("source_pages")) %}
+      <p class="source-evidence">
+        Source pages:
+        {{ section.get("source_pages", [section.get("source_page")])|join(", ") }}
+      </p>
+    {% endif %}
+    <form method="post" class="review-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="base_revision" value="{{ record.current_revision }}">
+      <input type="hidden" name="mode" value="fields">
+      {{ render_fields(section, pointer) }}
+      <label>Reason / source evidence <textarea name="reason" placeholder="Describe why this correction is supported by the source"></textarea></label>
+      <button type="submit">Save changes</button>
+    </form>
+
+    <details class="raw-editor">
+      <summary>Raw JSON fallback</summary>
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="base_revision" value="{{ record.current_revision }}">
+        <input type="hidden" name="mode" value="raw">
+        <textarea class="code-editor" name="raw_json" rows="24">{{ raw_json }}</textarea>
+        <label>Reason / source evidence <textarea name="reason" required></textarea></label>
+        <button type="submit">Save raw JSON</button>
+      </form>
+    </details>
+
+    <form method="post" class="signoff" action="{{ url_for('review.section_status', record_id=record.id, section_key=section_key) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="base_revision" value="{{ record.current_revision }}">
+      <h2>Section decision</h2>
+      <label>Status
+        <select name="status">
+          {% for value in ["pending", "approved", "needs_changes", "not_applicable"] %}
+            <option value="{{ value }}" {% if review and review.status == value %}selected{% endif %}>{{ value|replace("_", " ") }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Sign-off note <textarea name="comment">{{ review.comment if review else "" }}</textarea></label>
+      <button type="submit">Update decision</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,811 @@
+{
+  "version": 2,
+  "description": "v0.2 training manifest — ~100 trainable patients, patient-level split",
+  "created_at": "2026-06-18T17:34:17.177639+00:00",
+  "holdout_excluded": "Agatha Boccia",
+  "longitudinal_dir": "data/pilots/longitudinal_v2/opus_batch/twopass",
+  "train_count": 90,
+  "val_count": 10,
+  "patients": [
+    {
+      "patient_folder": "Adelie Norman",
+      "case_id": "v02-adelie-norman",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Adelie_Norman_twopass_longitudinal.json",
+      "visit_count": 7,
+      "max_followups": 4
+    },
+    {
+      "patient_folder": "Aisling Mattes",
+      "case_id": "v02-aisling-mattes",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Aisling_Mattes_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Asolo Cohen",
+      "case_id": "v02-asolo-cohen",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Asolo_Cohen_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Atlas Baier",
+      "case_id": "v02-atlas-baier",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Atlas_Baier_twopass_longitudinal.json",
+      "visit_count": 15,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Auggie Katman",
+      "case_id": "v02-auggie-katman",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Auggie_Katman_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Auggie of Golden Bond Rescue",
+      "case_id": "v02-auggie-of-golden-bond-rescue",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Auggie_of_Golden_Bond_Rescue_twopass_longitudinal.json",
+      "visit_count": 6,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bailey Chopper",
+      "case_id": "v02-bailey-chopper",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bailey_Chopper_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Barley Ross",
+      "case_id": "v02-barley-ross",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Barley_Ross_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Baxter Lohr",
+      "case_id": "v02-baxter-lohr",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Baxter_Lohr_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bellatrix Marshall",
+      "case_id": "v02-bellatrix-marshall",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bellatrix_Marshall_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bentley Kjesrud",
+      "case_id": "v02-bentley-kjesrud",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bentley_Kjesrud_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bigfoot Willing",
+      "case_id": "v02-bigfoot-willing",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bigfoot_Willing_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bijou Brackensick",
+      "case_id": "v02-bijou-brackensick",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bijou_Brackensick_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Birch Bailey",
+      "case_id": "v02-birch-bailey",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Birch_Bailey_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bodhi Kelly",
+      "case_id": "v02-bodhi-kelly",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bodhi_Kelly_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bodhi Quesnell",
+      "case_id": "v02-bodhi-quesnell",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bodhi_Quesnell_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bodhi Webb",
+      "case_id": "v02-bodhi-webb",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bodhi_Webb_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bonita Gregory",
+      "case_id": "v02-bonita-gregory",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bonita_Gregory_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bridget Ingram",
+      "case_id": "v02-bridget-ingram",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bridget_Ingram_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Buddy Montanez",
+      "case_id": "v02-buddy-montanez",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Buddy_Montanez_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Bunny Devine",
+      "case_id": "v02-bunny-devine",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Bunny_Devine_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Candace Morales",
+      "case_id": "v02-candace-morales",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Candace_Morales_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Captain Dan Roux",
+      "case_id": "v02-captain-dan-roux",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Captain_Dan_Roux_twopass_longitudinal.json",
+      "visit_count": 9,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Carl Walker",
+      "case_id": "v02-carl-walker",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Carl_Walker_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Cassiopeia LaPiro",
+      "case_id": "v02-cassiopeia-lapiro",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Cassiopeia_LaPiro_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Chance Connelly",
+      "case_id": "v02-chance-connelly",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Chance_Connelly_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Cleese Thau",
+      "case_id": "v02-cleese-thau",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Cleese_Thau_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Dash Simpson",
+      "case_id": "v02-dash-simpson",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Dash_Simpson_twopass_longitudinal.json",
+      "visit_count": 12,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Dexter Raban",
+      "case_id": "v02-dexter-raban",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Dexter_Raban_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Dharma Blakeslee",
+      "case_id": "v02-dharma-blakeslee",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Dharma_Blakeslee_twopass_longitudinal.json",
+      "visit_count": 6,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Disco Basque",
+      "case_id": "v02-disco-basque",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Disco_Basque_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Donnie McFadden",
+      "case_id": "v02-donnie-mcfadden",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Donnie_McFadden_twopass_longitudinal.json",
+      "visit_count": 8,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Dottie Hanner",
+      "case_id": "v02-dottie-hanner",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Dottie_Hanner_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Duncan Felch",
+      "case_id": "v02-duncan-felch",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Duncan_Felch_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Ella Kilfoyle",
+      "case_id": "v02-ella-kilfoyle",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Ella_Kilfoyle_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Elmer Snead",
+      "case_id": "v02-elmer-snead",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Elmer_Snead_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Elsie Willhite",
+      "case_id": "v02-elsie-willhite",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Elsie_Willhite_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Falco Gopisetty Srinivas",
+      "case_id": "v02-falco-gopisetty-srinivas",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Falco_Gopisetty_Srinivas_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Finley Lyon",
+      "case_id": "v02-finley-lyon",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Finley_Lyon_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Finnegan Zaluski",
+      "case_id": "v02-finnegan-zaluski",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Finnegan_Zaluski_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Frank Rischar",
+      "case_id": "v02-frank-rischar",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Frank_Rischar_twopass_longitudinal.json",
+      "visit_count": 9,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Frank Snead",
+      "case_id": "v02-frank-snead",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Frank_Snead_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Frank Woodell",
+      "case_id": "v02-frank-woodell",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Frank_Woodell_twopass_longitudinal.json",
+      "visit_count": 28,
+      "max_followups": 2
+    },
+    {
+      "patient_folder": "Frankie Yadav",
+      "case_id": "v02-frankie-yadav",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Frankie_Yadav_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Freya Lewis",
+      "case_id": "v02-freya-lewis",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Freya_Lewis_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Georgie Higgins",
+      "case_id": "v02-georgie-higgins",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Georgie_Higgins_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Goose Huckey",
+      "case_id": "v02-goose-huckey",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Goose_Huckey_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Gracie Goodman",
+      "case_id": "v02-gracie-goodman",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Gracie_Goodman_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Greta Alvarez",
+      "case_id": "v02-greta-alvarez",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Greta_Alvarez_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Gunner Grover",
+      "case_id": "v02-gunner-grover",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Gunner_Grover_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Gus Mulrennan",
+      "case_id": "v02-gus-mulrennan",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Gus_Mulrennan_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Hank Erickson",
+      "case_id": "v02-hank-erickson",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Hank_Erickson_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Hank Snead",
+      "case_id": "v02-hank-snead",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Hank_Snead_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Henry Comeaux-Fortier",
+      "case_id": "v02-henry-comeaux-fortier",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Henry_Comeaux-Fortier_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Henry Wolfe",
+      "case_id": "v02-henry-wolfe",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Henry_Wolfe_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Hiaasen Norman",
+      "case_id": "v02-hiaasen-norman",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Hiaasen_Norman_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Jack Campbell",
+      "case_id": "v02-jack-campbell",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Jack_Campbell_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Jaggy Becker",
+      "case_id": "v02-jaggy-becker",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Jaggy_Becker_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Jane Flint",
+      "case_id": "v02-jane-flint",
+      "split": "val",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Jane_Flint_twopass_longitudinal.json",
+      "visit_count": 7,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Joey Aloisio",
+      "case_id": "v02-joey-aloisio",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Joey_Aloisio_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Kazooie Yuhas",
+      "case_id": "v02-kazooie-yuhas",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Kazooie_Yuhas_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Kiwi Wanless",
+      "case_id": "v02-kiwi-wanless",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Kiwi_Wanless_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Lark Klein",
+      "case_id": "v02-lark-klein",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Lark_Klein_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Lars Hersch",
+      "case_id": "v02-lars-hersch",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Lars_Hersch_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Laz Edwards",
+      "case_id": "v02-laz-edwards",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Laz_Edwards_twopass_longitudinal.json",
+      "visit_count": 6,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Levi Robinson",
+      "case_id": "v02-levi-robinson",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Levi_Robinson_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Livia Ariston",
+      "case_id": "v02-livia-ariston",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Livia_Ariston_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Lou Cauvel",
+      "case_id": "v02-lou-cauvel",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Lou_Cauvel_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Lou Hazel",
+      "case_id": "v02-lou-hazel",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Lou_Hazel_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Luca Povolny",
+      "case_id": "v02-luca-povolny",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Luca_Povolny_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Lukka Polikoff",
+      "case_id": "v02-lukka-polikoff",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Lukka_Polikoff_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Maggie Ginney",
+      "case_id": "v02-maggie-ginney",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Maggie_Ginney_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Maple Wright",
+      "case_id": "v02-maple-wright",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Maple_Wright_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Marci Reyes-Otalora",
+      "case_id": "v02-marci-reyes-otalora",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Marci_Reyes-Otalora_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Mayson Grubb",
+      "case_id": "v02-mayson-grubb",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Mayson_Grubb_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Meera VanVoorhies",
+      "case_id": "v02-meera-vanvoorhies",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Meera_VanVoorhies_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Murphy Silverstein-Bode",
+      "case_id": "v02-murphy-silverstein-bode",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Murphy_Silverstein-Bode_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Nimbus Ganino",
+      "case_id": "v02-nimbus-ganino",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Nimbus_Ganino_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Noam Rosado",
+      "case_id": "v02-noam-rosado",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Noam_Rosado_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Nova Novelli",
+      "case_id": "v02-nova-novelli",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Nova_Novelli_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Otto Sheffer",
+      "case_id": "v02-otto-sheffer",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Otto_Sheffer_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Pepperoni Johnson",
+      "case_id": "v02-pepperoni-johnson",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Pepperoni_Johnson_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Piper Haug",
+      "case_id": "v02-piper-haug",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Piper_Haug_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Poppy Callahan",
+      "case_id": "v02-poppy-callahan",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Poppy_Callahan_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Poppy Gilik",
+      "case_id": "v02-poppy-gilik",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Poppy_Gilik_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Preena Little",
+      "case_id": "v02-preena-little",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Preena_Little_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Remy Straus",
+      "case_id": "v02-remy-straus",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Remy_Straus_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Rizzo Bates",
+      "case_id": "v02-rizzo-bates",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Rizzo_Bates_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Ruby Cheek",
+      "case_id": "v02-ruby-cheek",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Ruby_Cheek_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Ruth Bragdon",
+      "case_id": "v02-ruth-bragdon",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Ruth_Bragdon_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Rylee Ginney",
+      "case_id": "v02-rylee-ginney",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Rylee_Ginney_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Sailor Rose",
+      "case_id": "v02-sailor-rose",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Sailor_Rose_twopass_longitudinal.json",
+      "visit_count": 5,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Scooby Hillsman",
+      "case_id": "v02-scooby-hillsman",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Scooby_Hillsman_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Scout Korpos",
+      "case_id": "v02-scout-korpos",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Scout_Korpos_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Scramble Vicharelli",
+      "case_id": "v02-scramble-vicharelli",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Scramble_Vicharelli_twopass_longitudinal.json",
+      "visit_count": 4,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Sesto Dillon",
+      "case_id": "v02-sesto-dillon",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Sesto_Dillon_twopass_longitudinal.json",
+      "visit_count": 3,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Seymour Madariaga",
+      "case_id": "v02-seymour-madariaga",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Seymour_Madariaga_twopass_longitudinal.json",
+      "visit_count": 9,
+      "max_followups": 3
+    },
+    {
+      "patient_folder": "Tilly Bergquist",
+      "case_id": "v02-tilly-bergquist",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Tilly_Bergquist_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Tula Biglan",
+      "case_id": "v02-tula-biglan",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Tula_Biglan_twopass_longitudinal.json",
+      "visit_count": 1,
+      "max_followups": null
+    },
+    {
+      "patient_folder": "Zeus Becker",
+      "case_id": "v02-zeus-becker",
+      "split": "train",
+      "longitudinal_file": "data/pilots/longitudinal_v2/opus_batch/twopass/Zeus_Becker_twopass_longitudinal.json",
+      "visit_count": 2,
+      "max_followups": null
+    }
+  ]
+}

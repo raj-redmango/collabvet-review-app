@@ -1,0 +1,26 @@
+{
+  "description": "20 golden regression cases — holdout only. Never include in train or eval JSONL.",
+  "source": "20 chris_real golden regression cases (app evals/golden format)",
+  "case_ids": [
+    "wall-e-toderick",
+    "ruby-brunner",
+    "zucca-ramos",
+    "kima-macdonald",
+    "abigail-caba",
+    "agatha-boccia",
+    "cam-griswold",
+    "cayman-allison",
+    "ding-calhoun",
+    "grover-peterson",
+    "gulliver-jeong",
+    "jovi-sickles",
+    "koda-mitchell",
+    "blu-moore",
+    "koji-diaz",
+    "maisie-wood",
+    "sullivan-rupley",
+    "sweet-tooth-mahon",
+    "townes-baker",
+    "wolfie-webber"
+  ]
+}

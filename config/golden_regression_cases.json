@@ -1,0 +1,145 @@
+{
+  "description": "20 golden regression cases \u2014 holdout only. Maps app eval case_id to Pachel source folders.",
+  "cases": [
+    {
+      "case_id": "wall-e-toderick",
+      "extraction_case_id": "Wall-E_Toderick_clinicalSummary_1da52fafbf11764c3672a76d0ea44a8b",
+      "patient_folder": "Wall-E Toderick",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Wall-E_Toderick_clinicalSummary_1da52fafbf11764c3672a76d0ea44a8b.json"
+    },
+    {
+      "case_id": "ruby-brunner",
+      "extraction_case_id": "Ruby_Brunner_clinicalSummary_ea2de7a5a2be8f89f818b6e655d1ee20",
+      "patient_folder": "Ruby Brunner",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Ruby_Brunner_clinicalSummary_ea2de7a5a2be8f89f818b6e655d1ee20.json"
+    },
+    {
+      "case_id": "zucca-ramos",
+      "extraction_case_id": "Zucca_Ramos_clinicalSummary_6369198c31f39cc22be24b20fabad9be",
+      "patient_folder": "Zucca Ramos",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Zucca_Ramos_clinicalSummary_6369198c31f39cc22be24b20fabad9be.json"
+    },
+    {
+      "case_id": "kima-macdonald",
+      "extraction_case_id": "Kima_MacDonald_clinicalSummary_93914b1282701b8d1e341dfa9a96dbb1",
+      "patient_folder": "Kima MacDonald",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Kima_MacDonald_clinicalSummary_93914b1282701b8d1e341dfa9a96dbb1.json"
+    },
+    {
+      "case_id": "abigail-caba",
+      "extraction_case_id": "Abigail_Caba_clinicalSummary_01bd7c20f844e0875aec2cc8860f0558",
+      "patient_folder": "Abigail Caba",
+      "pairing_status": "partial",
+      "verified_intake_soap_gold": "Abigail_Caba_clinicalSummary_01bd7c20f844e0875aec2cc8860f0558.json"
+    },
+    {
+      "case_id": "agatha-boccia",
+      "extraction_case_id": "Agatha_Boccia_clinicalSummary_f8676b17b422876638d2f3b6373d1357",
+      "patient_folder": "Agatha Boccia",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Agatha_Boccia_clinicalSummary_f8676b17b422876638d2f3b6373d1357.json"
+    },
+    {
+      "case_id": "cam-griswold",
+      "extraction_case_id": "Cam_Griswold_clinicalSummary_6f5ea048da4433477f2ece38d9eb30e3",
+      "patient_folder": "Cam Griswold",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Cam_Griswold_clinicalSummary_6f5ea048da4433477f2ece38d9eb30e3.json"
+    },
+    {
+      "case_id": "cayman-allison",
+      "extraction_case_id": "Cayman_Allison_clinicalSummary_9c697c40da23fbb108f957bfe427e995",
+      "patient_folder": "Cayman Allison",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Cayman_Allison_clinicalSummary_9c697c40da23fbb108f957bfe427e995.json"
+    },
+    {
+      "case_id": "ding-calhoun",
+      "extraction_case_id": "Ding_Calhoun_clinicalSummary_620a80dbc967036c01512948f43adc7c",
+      "patient_folder": "Ding Calhoun",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Ding_Calhoun_clinicalSummary_620a80dbc967036c01512948f43adc7c.json"
+    },
+    {
+      "case_id": "grover-peterson",
+      "extraction_case_id": "Grover_Peterson_clinicalSummary_4b71ac7982f9569a41e338d71e52ab38",
+      "patient_folder": "Grover Peterson",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Grover_Peterson_clinicalSummary_4b71ac7982f9569a41e338d71e52ab38.json"
+    },
+    {
+      "case_id": "gulliver-jeong",
+      "extraction_case_id": "Gulliver_Jeong_clinicalSummary_b7b0eca0098eaeb7ba82492ebd77c108",
+      "patient_folder": "Gulliver Jeong",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Gulliver_Jeong_clinicalSummary_b7b0eca0098eaeb7ba82492ebd77c108.json"
+    },
+    {
+      "case_id": "jovi-sickles",
+      "extraction_case_id": "Jovi_Sickles_clinicalSummary_d6273e12ef05d052c6edb374172cc2a3",
+      "patient_folder": "Jovi Sickles",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Jovi_Sickles_clinicalSummary_d6273e12ef05d052c6edb374172cc2a3.json"
+    },
+    {
+      "case_id": "koda-mitchell",
+      "extraction_case_id": "Koda_Mitchell_clinicalSummary_e5d120f32f5c5583aaa3d5204835a8b4",
+      "patient_folder": "Koda Mitchell",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Koda_Mitchell_clinicalSummary_e5d120f32f5c5583aaa3d5204835a8b4.json"
+    },
+    {
+      "case_id": "blu-moore",
+      "extraction_case_id": "Blu_Moore_clinicalSummary_babdfcec7bf3e77b07820b60cd15a16b",
+      "patient_folder": "Blu Moore",
+      "pairing_status": "partial",
+      "verified_intake_soap_gold": "Blu_Moore_clinicalSummary_babdfcec7bf3e77b07820b60cd15a16b.json"
+    },
+    {
+      "case_id": "koji-diaz",
+      "extraction_case_id": "Koji_Diaz_clinicalSummary_bea3a4e1de30c6c49502442f1e853c8f",
+      "patient_folder": "Koji Diaz",
+      "pairing_status": "partial",
+      "verified_intake_soap_gold": "Koji_Diaz_clinicalSummary_bea3a4e1de30c6c49502442f1e853c8f.json"
+    },
+    {
+      "case_id": "maisie-wood",
+      "extraction_case_id": "Maisie_Wood_clinicalSummary_bb92c99f2729b8003969edee8edf592c",
+      "patient_folder": "Maisie Wood",
+      "pairing_status": "partial",
+      "verified_intake_soap_gold": "Maisie_Wood_clinicalSummary_bb92c99f2729b8003969edee8edf592c.json"
+    },
+    {
+      "case_id": "sullivan-rupley",
+      "extraction_case_id": "Sullivan_Rupley_clinicalSummary_bcf8721e9148af7dd4e134af22b24bd4",
+      "patient_folder": "Sullivan Rupley",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Sullivan_Rupley_clinicalSummary_bcf8721e9148af7dd4e134af22b24bd4.json"
+    },
+    {
+      "case_id": "sweet-tooth-mahon",
+      "extraction_case_id": "Sweet_Tooth_Mahon_clinicalSummary_d09415cfd1c32143d0b664272c3b7167",
+      "patient_folder": "Sweet Tooth Mahon",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Sweet_Tooth_Mahon_clinicalSummary_d09415cfd1c32143d0b664272c3b7167.json"
+    },
+    {
+      "case_id": "townes-baker",
+      "extraction_case_id": "Townes_Baker_clinicalSummary_cb0068c2cf9c929a381d1ee79ffa9a3e",
+      "patient_folder": "Townes Baker",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Townes_Baker_clinicalSummary_cb0068c2cf9c929a381d1ee79ffa9a3e.json"
+    },
+    {
+      "case_id": "wolfie-webber",
+      "extraction_case_id": "Wolfie_Webber_clinicalSummary_ea5cc93ae6d36bba917e9bee80d09010",
+      "patient_folder": "Wolfie Webber",
+      "pairing_status": "ok",
+      "verified_intake_soap_gold": "Wolfie_Webber_clinicalSummary_ea5cc93ae6d36bba917e9bee80d09010.json"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Approve {{ record.patient_folder }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><a href="{{ url_for('review.case_overview', record_id=record.id) }}">← Case</a><h1>Final sign-off</h1></div>
+</div>
+<section class="panel">
+  <h2>{{ record.patient_folder }}</h2>
+  {% if record.is_holdout %}
+    <p class="warning">This is a golden holdout. It may be reviewed and exported, but the training gate will always exclude it.</p>
+  {% endif %}
+  {% if blockers %}
+    <h3>Approval blockers</h3>
+    <ul class="issue-list">
+      {% for blocker in blockers %}<li class="error">{{ blocker }}</li>{% endfor %}
+    </ul>
+    <p>Resolve every blocker before final approval.</p>
+  {% else %}
+    <p class="success-text">All sections are current, schema validation passes, and no blocking comments remain.</p>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="checkbox"><input type="checkbox" required> I confirm this record matches the available source evidence.</label>
+      <button type="submit">Approve and export</button>
+    </form>
+  {% endif %}
+</section>
+<section class="panel">
+  <h2>Correction diff</h2>
+  {% for row in diff_rows %}
+    <article class="diff-row">
+      <p><strong>Revision {{ row.revision }} · {{ row.operation }}</strong> <code>{{ row.path }}</code> · {{ row.author }}</p>
+      <div class="summary-grid">
+        <div><h3>Before</h3><pre class="preview">{{ row.before|tojson(indent=2) }}</pre></div>
+        <div><h3>After</h3><pre class="preview">{{ row.after|tojson(indent=2) }}</pre></div>
+      </div>
+      {% if row.reason %}<p><strong>Evidence/reason:</strong> {{ row.reason }}</p>{% endif %}
+    </article>
+  {% else %}
+    <p class="muted">No corrections. Approval will attest that the immutable extraction matches source evidence.</p>
+  {% endfor %}
+</section>
+{% endblock %}
