@@ -191,7 +191,7 @@ def test_login_headers_queue_and_audit(app):
         assert AuditEvent.query.filter_by(event_type="login_success").count() == 1
 
 
-def test_external_cases_layout_is_indexed_and_missing_cases_are_retired(app):
+def test_external_cases_layout_is_indexed_and_missing_cases_are_removed(app):
     path = write_external_case(app)
     with app.app_context():
         first = index_cases()
@@ -203,8 +203,8 @@ def test_external_cases_layout_is_indexed_and_missing_cases_are_retired(app):
 
         path.unlink()
         second = index_cases()
-        assert second["retired"] == 1
-        assert CaseRecord.query.one().status == "retired"
+        assert second["removed"] == 1
+        assert CaseRecord.query.count() == 0
 
     client = app.test_client()
     response = login(client)

@@ -22,6 +22,7 @@ from collabvet_review_app.models import (
     ApprovedExport,
     AuditEvent,
     CaseRecord,
+    ReviewComment,
     Revision,
     SectionReview,
     User,
@@ -36,7 +37,6 @@ ALLOWED_CASE_STATUSES = {
     "needs_changes",
     "approved",
     "rejected",
-    "retired",
 }
 VISIT_TYPES = {"intake", "recheck", "phone_consult", "v2v_consult", "other"}
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
@@ -193,7 +193,7 @@ def index_cases() -> dict[str, int | str]:
 
     holdout_ids, holdout_folders = load_holdouts()
     splits = _manifest_splits()
-    created = updated = stale = skipped = retired = 0
+    created = updated = stale = skipped = removed = 0
     indexed_case_ids: set[str] = set()
     for patient, path in rows:
         path = path.resolve()
@@ -232,8 +232,6 @@ def index_cases() -> dict[str, int | str]:
             db.session.add(record)
             created += 1
         else:
-            if record.status == "retired":
-                record.status = "pending"
             if record.source_hash != source_hash:
                 record.source_hash = source_hash
                 record.current_revision = (
@@ -253,17 +251,25 @@ def index_cases() -> dict[str, int | str]:
             record.is_holdout = is_holdout
             record.visit_count = len(data.get("visits") or [])
             updated += 1
-    for record in CaseRecord.query.filter(CaseRecord.case_id.notin_(indexed_case_ids)).all():
-        if record.status != "retired":
-            record.status = "retired"
-            retired += 1
+    obsolete_ids = [
+        row.id
+        for row in CaseRecord.query.filter(CaseRecord.case_id.notin_(indexed_case_ids)).all()
+    ]
+    if obsolete_ids:
+        for model in (Revision, SectionReview, ReviewComment, ApprovedExport, AuditEvent):
+            model.query.filter(model.case_id.in_(obsolete_ids)).delete(
+                synchronize_session=False
+            )
+        removed = CaseRecord.query.filter(CaseRecord.id.in_(obsolete_ids)).delete(
+            synchronize_session=False
+        )
     db.session.commit()
     return {
         "source_revision": source_revision,
         "created": created,
         "updated": updated,
         "stale": stale,
-        "retired": retired,
+        "removed": removed,
         "skipped": skipped,
     }
 
@@ -985,8 +991,6 @@ def revision_diff_rows(record: CaseRecord) -> list[dict[str, Any]]:
 
 
 def approval_blockers(record: CaseRecord) -> list[str]:
-    if record.status == "retired":
-        return ["Case is no longer present in the clinical-data cases/ source"]
     data = normalize_for_review(materialize_case(record))
     blockers = [
         f"{item['path']}: {item['message']}"
@@ -1117,11 +1121,7 @@ def rebuild_approved_index() -> Path:
         latest[export.case_id] = export
     for export in latest.values():
         record = db.session.get(CaseRecord, export.case_id)
-        if (
-            record is None
-            or record.status == "retired"
-            or export.source_hash != record.source_hash
-        ):
+        if record is None or export.source_hash != record.source_hash:
             continue
         rows.append(
             {

@@ -93,8 +93,6 @@ def queue():
     status = request.args.get("status", "").strip()
     if status:
         query = query.filter_by(status=status)
-    else:
-        query = query.filter(CaseRecord.status != "retired")
     holdout = request.args.get("holdout", "").strip()
     if holdout in {"yes", "no"}:
         query = query.filter_by(is_holdout=holdout == "yes")
