@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import sqlite3
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LIVE = ROOT / "data" / "review_app" / "review.sqlite3"
 BACKUP = ROOT / "data" / "review_app" / "review.sqlite3.pre-migration-backup"
-INPUT_ROOT = (ROOT / "data" / "review_inputs").resolve()
+CLINICAL_DATA_ROOT = Path(
+    os.environ.get("REVIEW_CLINICAL_DATA_ROOT", ROOT.parent / "collabvet-clinical-data")
+).resolve()
+INPUT_ROOT = (CLINICAL_DATA_ROOT / "cases").resolve()
 
 
 def counts(path: Path) -> dict[str, int]:

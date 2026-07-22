@@ -16,12 +16,27 @@ Copy-Item .env.example .env
 Replace `REVIEW_SECRET_KEY` in `.env`, and set `REVIEW_SOURCE_ROOT` to the
 PII-removed patient-document directory if source-document viewing is required.
 
+Clone the private clinical-data repository beside this repository. The review app
+reads canonical cases directly from its `cases/` directory and never copies them
+into this repository:
+
+```powershell
+cd C:\Projects
+git clone https://github.com/sachin-redmango/collabvet-clinical-data.git
+cd collabvet-review-app
+```
+
+If the checkout is elsewhere, set `REVIEW_CLINICAL_DATA_ROOT` to its root. Before
+indexing, the app verifies that the checkout is clean, on `main`, and has the
+expected GitHub origin.
+
 ## Initialize and run
 
 ```powershell
 $env:FLASK_APP = "collabvet_review_app:create_app"
 python -m flask init-db
 python -m flask create-user
+python -m flask verify-case-source
 python -m flask index-cases
 collabvet-review
 ```
@@ -31,7 +46,7 @@ rejected unless `REVIEW_ALLOW_LAN_BIND=true`.
 
 ## Local data
 
-- `data/review_inputs/`: immutable twopass JSON inputs
+- `<REVIEW_CLINICAL_DATA_ROOT>/cases/`: canonical immutable schema-v2 inputs
 - `data/teacher/teacher/gap/`: Stage A teacher artifacts
 - `data/review_app/review.sqlite3`: users, reviews, revisions, and audit history
 - `data/review_app/approved/`: scrubbed approved exports

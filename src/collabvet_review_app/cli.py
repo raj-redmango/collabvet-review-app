@@ -14,7 +14,11 @@ from flask.cli import with_appcontext
 from sqlalchemy import inspect, text
 
 from collabvet_review_app.models import User, db
-from collabvet_review_app.services import index_cases, rebuild_approved_index
+from collabvet_review_app.services import (
+    index_cases,
+    rebuild_approved_index,
+    verify_clinical_data_checkout,
+)
 
 
 @click.command("init-db")
@@ -98,6 +102,24 @@ def index_cases_command() -> None:
     click.echo(json.dumps(result, indent=2))
 
 
+@click.command("verify-case-source")
+@with_appcontext
+def verify_case_source_command() -> None:
+    """Verify the external clinical-data checkout and print its revision."""
+
+    revision = verify_clinical_data_checkout()
+    click.echo(
+        json.dumps(
+            {
+                "repository": current_app.config["CLINICAL_DATA_REPOSITORY"],
+                "cases_root": str(current_app.config["INPUT_ROOT"]),
+                "revision": revision,
+            },
+            indent=2,
+        )
+    )
+
+
 @click.command("export-index")
 @with_appcontext
 def export_index_command() -> None:
@@ -138,6 +160,7 @@ def register_cli(app) -> None:
     app.cli.add_command(create_user_command)
     app.cli.add_command(set_password_command)
     app.cli.add_command(index_cases_command)
+    app.cli.add_command(verify_case_source_command)
     app.cli.add_command(export_index_command)
     app.cli.add_command(backup_command)
     app.cli.add_command(generate_secret_command)

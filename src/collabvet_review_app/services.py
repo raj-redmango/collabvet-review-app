@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import tempfile
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -29,7 +30,14 @@ from collabvet_review_app.models import (
 from collabvet_review_app.training.replay import StageExample, replay_case
 
 ALLOWED_SECTION_STATUSES = {"pending", "approved", "needs_changes", "not_applicable"}
-ALLOWED_CASE_STATUSES = {"pending", "in_review", "needs_changes", "approved", "rejected"}
+ALLOWED_CASE_STATUSES = {
+    "pending",
+    "in_review",
+    "needs_changes",
+    "approved",
+    "rejected",
+    "retired",
+}
 VISIT_TYPES = {"intake", "recheck", "phone_consult", "v2v_consult", "other"}
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
 PHONE_RE = re.compile(r"(?<!\d)(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}(?!\d)")
@@ -72,6 +80,75 @@ def _slug(value: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
 
 
+def _canonical_git_remote(value: str) -> str:
+    remote = value.strip().replace("\\", "/").lower()
+    if remote.startswith("git@github.com:"):
+        remote = "https://github.com/" + remote.removeprefix("git@github.com:")
+    remote = remote.rstrip("/")
+    if remote.endswith(".git"):
+        remote = remote[:-4]
+    return remote
+
+
+def _git(checkout: Path, *args: str) -> str:
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-c",
+                f"safe.directory={checkout.as_posix()}",
+                "-C",
+                str(checkout),
+                *args,
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("Git is required to verify the clinical-data checkout") from exc
+    except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or exc.stdout or "Git command failed").strip()
+        raise RuntimeError(f"Cannot verify clinical-data checkout: {detail}") from exc
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError("Timed out while verifying the clinical-data checkout") from exc
+    return result.stdout.strip()
+
+
+def verify_clinical_data_checkout() -> str:
+    """Verify that INPUT_ROOT is cases/ in the approved external Git checkout."""
+
+    if current_app.config.get("TESTING"):
+        return "testing"
+    input_root = Path(current_app.config["INPUT_ROOT"]).resolve()
+    checkout = Path(current_app.config["CLINICAL_DATA_ROOT"]).resolve()
+    expected_input = (checkout / "cases").resolve()
+    if input_root != expected_input:
+        raise RuntimeError("Case input must be the cases/ directory in REVIEW_CLINICAL_DATA_ROOT")
+    if not input_root.is_dir():
+        raise RuntimeError(
+            f"Clinical case directory not found: {input_root}. Clone the private "
+            "collabvet-clinical-data repository and set REVIEW_CLINICAL_DATA_ROOT."
+        )
+    top_level = Path(_git(checkout, "rev-parse", "--show-toplevel")).resolve()
+    if top_level != checkout:
+        raise RuntimeError("REVIEW_CLINICAL_DATA_ROOT is not the Git checkout root")
+    expected_remote = _canonical_git_remote(current_app.config["CLINICAL_DATA_REPOSITORY"])
+    actual_remote = _canonical_git_remote(_git(checkout, "remote", "get-url", "origin"))
+    if actual_remote != expected_remote:
+        raise RuntimeError(
+            "Clinical-data origin must be "
+            f"{current_app.config['CLINICAL_DATA_REPOSITORY']}; found {actual_remote}"
+        )
+    branch = _git(checkout, "branch", "--show-current")
+    if branch != "main":
+        raise RuntimeError(f"Clinical-data checkout must be on main; found {branch or 'detached HEAD'}")
+    if _git(checkout, "status", "--porcelain", "--", "cases"):
+        raise RuntimeError("Clinical-data cases/ has uncommitted changes")
+    return _git(checkout, "rev-parse", "HEAD")
+
+
 def load_holdouts() -> tuple[set[str], set[str]]:
     config_root = Path(current_app.config["CONFIG_ROOT"]).resolve()
     ids_path = config_root / "holdout_golden.json"
@@ -99,9 +176,10 @@ def _manifest_splits() -> dict[str, str]:
     }
 
 
-def index_cases() -> dict[str, int]:
+def index_cases() -> dict[str, int | str]:
     """Upsert all completed extractions into the review queue."""
 
+    source_revision = verify_clinical_data_checkout()
     input_root = Path(current_app.config["INPUT_ROOT"]).resolve()
     registry = input_root / "twopass_completed.json"
     rows: list[tuple[str, Path]] = []
@@ -111,14 +189,12 @@ def index_cases() -> dict[str, int]:
             if name:
                 rows.append((patient, input_root / name))
     else:
-        rows = [
-            (path.stem.replace("_twopass_longitudinal", "").replace("_", " "), path)
-            for path in input_root.glob("*_twopass_longitudinal.json")
-        ]
+        rows = [("", path) for path in sorted(input_root.glob("*.json"))]
 
     holdout_ids, holdout_folders = load_holdouts()
     splits = _manifest_splits()
-    created = updated = stale = skipped = 0
+    created = updated = stale = skipped = retired = 0
+    indexed_case_ids: set[str] = set()
     for patient, path in rows:
         path = path.resolve()
         if not path.is_file() or not path.is_relative_to(input_root):
@@ -129,7 +205,13 @@ def index_cases() -> dict[str, int]:
         except (OSError, ValueError, json.JSONDecodeError):
             skipped += 1
             continue
+        patient = str(
+            patient
+            or data.get("patient_folder")
+            or path.stem.removeprefix("v02-").replace("-", " ").title()
+        )
         case_id = str(data.get("case_id") or _slug(patient))
+        indexed_case_ids.add(case_id)
         source_hash = sha256_file(path)
         is_holdout = (
             _slug(case_id) in holdout_ids
@@ -150,6 +232,8 @@ def index_cases() -> dict[str, int]:
             db.session.add(record)
             created += 1
         else:
+            if record.status == "retired":
+                record.status = "pending"
             if record.source_hash != source_hash:
                 record.source_hash = source_hash
                 record.current_revision = (
@@ -169,8 +253,19 @@ def index_cases() -> dict[str, int]:
             record.is_holdout = is_holdout
             record.visit_count = len(data.get("visits") or [])
             updated += 1
+    for record in CaseRecord.query.filter(CaseRecord.case_id.notin_(indexed_case_ids)).all():
+        if record.status != "retired":
+            record.status = "retired"
+            retired += 1
     db.session.commit()
-    return {"created": created, "updated": updated, "stale": stale, "skipped": skipped}
+    return {
+        "source_revision": source_revision,
+        "created": created,
+        "updated": updated,
+        "stale": stale,
+        "retired": retired,
+        "skipped": skipped,
+    }
 
 
 def source_case(record: CaseRecord) -> dict[str, Any]:
@@ -890,6 +985,8 @@ def revision_diff_rows(record: CaseRecord) -> list[dict[str, Any]]:
 
 
 def approval_blockers(record: CaseRecord) -> list[str]:
+    if record.status == "retired":
+        return ["Case is no longer present in the clinical-data cases/ source"]
     data = normalize_for_review(materialize_case(record))
     blockers = [
         f"{item['path']}: {item['message']}"
@@ -1020,7 +1117,11 @@ def rebuild_approved_index() -> Path:
         latest[export.case_id] = export
     for export in latest.values():
         record = db.session.get(CaseRecord, export.case_id)
-        if record is None or export.source_hash != record.source_hash:
+        if (
+            record is None
+            or record.status == "retired"
+            or export.source_hash != record.source_hash
+        ):
             continue
         rows.append(
             {

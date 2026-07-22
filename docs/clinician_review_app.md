@@ -18,7 +18,7 @@ Set these environment variables in the launch session or a protected local envir
 
 ```powershell
 $env:REVIEW_SECRET_KEY = "<generated value>"
-$env:REVIEW_INPUT_ROOT = "C:\path\to\twopass"
+$env:REVIEW_CLINICAL_DATA_ROOT = "C:\Projects\collabvet-clinical-data"
 $env:REVIEW_SOURCE_ROOT = "C:\path\to\PII-removed source folders"
 $env:REVIEW_OUTPUT_ROOT = "C:\path\to\review artifacts"
 $env:REVIEW_INSTANCE_ROOT = "C:\path\to\review instance"
@@ -34,6 +34,7 @@ Initialize and index:
 ```powershell
 py -m flask init-db
 py -m flask create-user
+py -m flask verify-case-source
 py -m flask index-cases
 collabvet-review
 ```

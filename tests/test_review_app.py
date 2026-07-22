@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from scripts.generate_review_demo import generate
+import collabvet_review_app.services as review_services
 from collabvet_review_app import create_app
 from collabvet_review_app.models import (
     AuditEvent,
@@ -25,6 +26,7 @@ from collabvet_review_app.services import (
     sha256_file,
     update_section,
     validate_longitudinal,
+    verify_clinical_data_checkout,
 )
 from collabvet_review_app.training_gate import build_approved_manifest
 
@@ -140,6 +142,15 @@ def write_registry_case(app, data: dict | None = None, patient: str = "Synthetic
     return case_path
 
 
+def write_external_case(app, data: dict | None = None, patient: str = "Synthetic One") -> Path:
+    data = data or synthetic_case()
+    data["patient_folder"] = patient
+    root = Path(app.config["INPUT_ROOT"])
+    case_path = root / f"v02-{data['case_id']}.json"
+    case_path.write_text(json.dumps(data), encoding="utf-8")
+    return case_path
+
+
 def login(client):
     return client.post(
         "/login",
@@ -178,6 +189,66 @@ def test_login_headers_queue_and_audit(app):
     assert "default-src 'self'" in response.headers["Content-Security-Policy"]
     with app.app_context():
         assert AuditEvent.query.filter_by(event_type="login_success").count() == 1
+
+
+def test_external_cases_layout_is_indexed_and_missing_cases_are_retired(app):
+    path = write_external_case(app)
+    with app.app_context():
+        first = index_cases()
+        assert first["source_revision"] == "testing"
+        assert first["created"] == 1
+        record = CaseRecord.query.one()
+        assert record.patient_folder == "Synthetic One"
+        assert Path(record.source_path).name == "v02-synthetic-one.json"
+
+        path.unlink()
+        second = index_cases()
+        assert second["retired"] == 1
+        assert CaseRecord.query.one().status == "retired"
+
+    client = app.test_client()
+    response = login(client)
+    assert b"Synthetic One" not in response.data
+
+
+def test_external_checkout_origin_is_verified(app, tmp_path: Path, monkeypatch):
+    checkout = tmp_path / "collabvet-clinical-data"
+    (checkout / "cases").mkdir(parents=True)
+    app.config.update(
+        {
+            "TESTING": False,
+            "CLINICAL_DATA_ROOT": checkout,
+            "INPUT_ROOT": checkout / "cases",
+            "CLINICAL_DATA_REPOSITORY": (
+                "https://github.com/sachin-redmango/collabvet-clinical-data.git"
+            ),
+        }
+    )
+
+    def fake_git(_checkout, *args):
+        values = {
+            ("rev-parse", "--show-toplevel"): str(checkout),
+            ("remote", "get-url", "origin"): (
+                "git@github.com:sachin-redmango/collabvet-clinical-data.git"
+            ),
+            ("branch", "--show-current"): "main",
+            ("status", "--porcelain", "--", "cases"): "",
+            ("rev-parse", "HEAD"): "abc123",
+        }
+        return values[args]
+
+    monkeypatch.setattr(review_services, "_git", fake_git)
+    with app.app_context():
+        assert verify_clinical_data_checkout() == "abc123"
+
+        def wrong_origin(_checkout, *args):
+            if args == ("remote", "get-url", "origin"):
+                return "https://github.com/example/wrong.git"
+            return fake_git(_checkout, *args)
+
+        monkeypatch.setattr(review_services, "_git", wrong_origin)
+        with pytest.raises(RuntimeError, match="origin must be"):
+            verify_clinical_data_checkout()
 
 
 def test_case_can_be_assigned_to_named_reviewer(app):

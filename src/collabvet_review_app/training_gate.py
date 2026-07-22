@@ -43,11 +43,12 @@ def _current_sources(input_root: Path) -> dict[str, tuple[Path, str]]:
             if entry.get("longitudinal_file"):
                 candidates.append((patient, input_root / entry["longitudinal_file"]))
     else:
-        candidates.extend(("", path) for path in input_root.glob("*_twopass_longitudinal.json"))
+        candidates.extend(("", path) for path in sorted(input_root.glob("*.json")))
     for patient, path in candidates:
         if not path.is_file():
             continue
         data = read_json(path)
+        patient = str(patient or data.get("patient_folder") or "")
         case_id = str(data.get("case_id") or _slug(patient or path.stem))
         value = (path.resolve(), sha256_file(path))
         result[_slug(case_id)] = value

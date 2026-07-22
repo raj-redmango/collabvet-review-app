@@ -11,6 +11,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / ".env")
 
 DATA_ROOT = PROJECT_ROOT / "data"
+DEFAULT_CLINICAL_DATA_ROOT = PROJECT_ROOT.parent / "collabvet-clinical-data"
+DEFAULT_CLINICAL_DATA_REPOSITORY = (
+    "https://github.com/sachin-redmango/collabvet-clinical-data.git"
+)
 
 
 def _bool_env(name: str, default: bool = False) -> bool:
@@ -32,12 +36,11 @@ class ReviewConfig:
     """Secure local defaults; override with REVIEW_* environment variables."""
 
     SECRET_KEY = os.environ.get("REVIEW_SECRET_KEY", "")
-    INPUT_ROOT = Path(
-        os.environ.get(
-            "REVIEW_INPUT_ROOT",
-            DATA_ROOT / "review_inputs",
-        )
+    CLINICAL_DATA_ROOT = Path(
+        os.environ.get("REVIEW_CLINICAL_DATA_ROOT", DEFAULT_CLINICAL_DATA_ROOT)
     ).resolve()
+    CLINICAL_DATA_REPOSITORY = DEFAULT_CLINICAL_DATA_REPOSITORY
+    INPUT_ROOT = (CLINICAL_DATA_ROOT / "cases").resolve()
     SOURCE_ROOT = Path(
         os.environ.get("REVIEW_SOURCE_ROOT", DATA_ROOT / "source_documents")
     ).resolve()
