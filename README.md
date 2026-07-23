@@ -64,3 +64,6 @@ python scripts\generate_review_demo.py
 
 See `docs/clinician_review_app.md` for workflow, security, backup, and Cloudflare
 Access details.
+
+See `docs/clinical_insights.md` for the staging Clinical Insights API contract,
+authentication boundary, source inventory, and currently unavailable API fields.

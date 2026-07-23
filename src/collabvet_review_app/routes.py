@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import urllib.parse
 from typing import Any
 
 import fitz
@@ -29,6 +30,7 @@ from collabvet_review_app.models import (
     db,
     utcnow,
 )
+from collabvet_review_app.insights import InsightsAPIError, clinical_insights_request
 from collabvet_review_app.security import rate_limit
 from collabvet_review_app.services import (
     add_revision,
@@ -49,6 +51,18 @@ from collabvet_review_app.services import (
 from collabvet_review_app.training.prompts import SYSTEM_BY_STAGE
 
 bp = Blueprint("review", __name__)
+
+INSIGHTS_RESOURCES = {
+    "overview": "/api/v1/app-admin/clinical-insights/overview",
+    "patterns": "/api/v1/app-admin/clinical-insights/patterns",
+    "pathways": "/api/v1/app-admin/clinical-insights/pathways",
+    "safety": "/api/v1/app-admin/clinical-insights/safety",
+    "interventions": "/api/v1/app-admin/clinical-insights/interventions",
+    "runs": "/api/v1/app-admin/clinical-insights/runs",
+    "cases": "/api/v1/app-admin/clinical-insights/cases",
+    "knowledge": "/api/v1/app-admin/clinical-insights/knowledge",
+}
+INSIGHTS_QUERY_KEYS = {"run_id", "vb_id", "offset", "limit", "q"}
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -113,6 +127,64 @@ def queue():
         )
     cases = query.order_by(CaseRecord.status, CaseRecord.patient_folder).all()
     return render_template("queue.html", cases=cases, reviewers=reviewers)
+
+
+@bp.get("/clinical-insights")
+@login_required
+def clinical_insights():
+    return render_template("clinical_insights.html")
+
+
+def _insights_json(path: str):
+    query = {
+        key: value
+        for key, value in request.args.items()
+        if key in INSIGHTS_QUERY_KEYS and value != ""
+    }
+    try:
+        return jsonify(clinical_insights_request(path, query))
+    except InsightsAPIError as exc:
+        return jsonify({"error": str(exc), "status": exc.status}), exc.status
+
+
+@bp.get("/clinical-insights/api/<resource>")
+@login_required
+def clinical_insights_api(resource: str):
+    path = INSIGHTS_RESOURCES.get(resource)
+    if path is None:
+        abort(404)
+    return _insights_json(path)
+
+
+@bp.get("/clinical-insights/api/metrics/<metric>")
+@login_required
+def clinical_insights_metric(metric: str):
+    allowed = {
+        "medications",
+        "adverse_effects",
+        "training_support",
+        "provider_caution",
+        "improvements",
+        "follow_up_outcomes",
+    }
+    if metric not in allowed:
+        abort(404)
+    return _insights_json(f"/api/v1/app-admin/clinical-insights/metrics/{metric}")
+
+
+@bp.get("/clinical-insights/api/cases/<case_id>")
+@login_required
+def clinical_insights_case(case_id: str):
+    safe_id = urllib.parse.quote(case_id, safe="")
+    return _insights_json(f"/api/v1/app-admin/clinical-insights/cases/{safe_id}")
+
+
+@bp.get("/clinical-insights/api/pathway-comparisons")
+@login_required
+def clinical_insights_comparisons():
+    return _insights_json(
+        "/api/v1/app-admin/clinical-insights/pathway-comparisons"
+    )
 
 
 def _record_or_404(record_id: int) -> CaseRecord:

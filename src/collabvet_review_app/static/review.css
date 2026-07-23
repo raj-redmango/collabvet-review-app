@@ -15,6 +15,9 @@ a { color: #126757; }
 main { max-width: 1500px; margin: 0 auto; padding: 24px; }
 .topbar { display: flex; align-items: center; gap: 20px; min-height: 58px; padding: 10px 24px; color: white; background: #153b34; }
 .topbar .brand { margin-right: auto; color: white; font-weight: 700; text-decoration: none; }
+.topnav { display: flex; gap: 14px; }
+.topnav a { color: #d8ece7; text-decoration: none; }
+.topnav a:hover { color: white; text-decoration: underline; }
 .topbar form { margin: 0; }
 h1, h2, h3 { line-height: 1.2; }
 h1 { margin: 8px 0; }
@@ -93,8 +96,48 @@ pre.preview { overflow: auto; white-space: pre-wrap; }
 .flash.error { color: var(--danger); background: #f7dedf; }
 .flash.success { color: #176044; background: #d9f0e4; }
 .empty { padding: 30px; color: var(--muted); text-align: center; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.insights-heading { align-items: end; }
+.insights-filters { display: flex; gap: 12px; min-width: min(540px, 100%); }
+.insights-filters label { flex: 1; margin: 0; }
+.clinical-caution { margin-bottom: 20px; border-left: 5px solid #b07a17; border-radius: 6px; padding: 12px 16px; color: #66460d; background: #fff6dd; }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 16px; }
+.metric-card { min-height: 118px; border: 1px solid var(--line); border-radius: 8px; padding: 14px; text-align: left; color: var(--ink); background: #fbfdfc; }
+.metric-card[disabled] { cursor: default; opacity: .68; }
+.metric-card .metric-value { display: block; margin: 5px 0; font-size: 28px; font-weight: 750; }
+.metric-card .metric-label { font-weight: 700; }
+.metric-card small { display: block; }
+.metadata-strip { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; color: var(--muted); font-size: 13px; }
+.insights-tabs { display: flex; gap: 7px; overflow-x: auto; margin-bottom: 12px; padding-bottom: 4px; }
+.insights-tab { flex: 0 0 auto; color: var(--ink); background: #e3ece9; }
+.insights-tab.active { color: white; background: var(--accent); }
+.tab-search { display: grid; grid-template-columns: minmax(240px, 1fr) auto; gap: 8px; margin: 15px 0; }
+.tab-state { border-radius: 6px; padding: 12px; color: var(--muted); background: #f4f7f6; }
+.tab-state:empty { display: none; }
+.insights-error { margin-top: 12px; border-radius: 6px; padding: 12px; color: var(--danger); background: #f7dedf; }
+.insights-table-wrap { overflow-x: auto; }
+.insights-table { width: 100%; border-collapse: collapse; }
+.insights-table th, .insights-table td { border-bottom: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
+.insights-table th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+.insights-table tbody tr[data-detail-id] { cursor: pointer; }
+.insights-table tbody tr[data-detail-id]:hover { background: #f0f7f5; }
+.insight-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.insight-card { border: 1px solid var(--line); border-radius: 8px; padding: 15px; background: #fbfdfc; }
+.insight-card h3 { margin-top: 0; }
+.insight-card ul { padding-left: 20px; }
+.pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; color: var(--muted); }
+.pagination div { display: flex; gap: 8px; }
+.insights-dialog { width: min(1100px, 94vw); max-height: 90vh; border: 1px solid var(--line); border-radius: 10px; padding: 20px; color: var(--ink); }
+.insights-dialog::backdrop { background: #0b211dcc; }
+.dialog-heading { display: flex; justify-content: space-between; gap: 16px; }
+.detail-object { display: grid; grid-template-columns: minmax(150px, .35fr) 1fr; gap: 7px 14px; border-top: 1px solid var(--line); padding: 12px 0; }
+.detail-key { color: var(--muted); font-weight: 650; }
+.detail-value { min-width: 0; overflow-wrap: anywhere; }
 @media (max-width: 900px) {
   .filters, .summary-grid, .split-review { grid-template-columns: 1fr; }
   .source-pane { position: static; height: 65vh; }
   .page-heading { flex-direction: column; }
+  .topbar { flex-wrap: wrap; }
+  .topnav { order: 3; width: 100%; }
+  .insights-filters { min-width: 100%; flex-direction: column; }
 }

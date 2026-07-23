@@ -10,6 +10,7 @@ import pytest
 from scripts.generate_review_demo import generate
 import collabvet_review_app.services as review_services
 from collabvet_review_app import create_app
+from collabvet_review_app.insights import discover_api_base_url
 from collabvet_review_app.models import (
     AuditEvent,
     CaseRecord,
@@ -189,6 +190,89 @@ def test_login_headers_queue_and_audit(app):
     assert "default-src 'self'" in response.headers["Content-Security-Policy"]
     with app.app_context():
         assert AuditEvent.query.filter_by(event_type="login_success").count() == 1
+
+
+def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
+    client = app.test_client()
+    assert client.get("/clinical-insights").status_code == 302
+    login(client)
+    response = client.get("/clinical-insights")
+    assert response.status_code == 200
+    for tab in (
+        "patterns",
+        "pathways",
+        "treatments",
+        "medications",
+        "safety",
+        "cases",
+        "knowledge",
+        "runs",
+    ):
+        assert f'data-search-tab="{tab}"'.encode() in response.data
+        assert f'data-clear-tab="{tab}"'.encode() in response.data
+
+
+def test_clinical_insights_proxy_preserves_filters_and_rejects_unknowns(app, monkeypatch):
+    captured = {}
+
+    def fake_request(path, query):
+        captured.update({"path": path, "query": query})
+        return {"items": [], "total": 0}
+
+    monkeypatch.setattr("collabvet_review_app.routes.clinical_insights_request", fake_request)
+    client = app.test_client()
+    login(client)
+    response = client.get(
+        "/clinical-insights/api/cases?run_id=run-1&vb_id=vb-1&q=fear&offset=10&limit=10&unsafe=x"
+    )
+    assert response.status_code == 200
+    assert captured == {
+        "path": "/api/v1/app-admin/clinical-insights/cases",
+        "query": {
+            "run_id": "run-1",
+            "vb_id": "vb-1",
+            "q": "fear",
+            "offset": "10",
+            "limit": "10",
+        },
+    }
+    assert client.get("/clinical-insights/api/not-real").status_code == 404
+
+
+def test_clinical_insights_api_base_is_discovered_from_environment():
+    assert discover_api_base_url(
+        {
+            "FRONTEND_URL": "https://frontend.example",
+            "CORS_ORIGINS": "https://frontend.example,https://api.example",
+        }
+    ) == "https://api.example"
+
+
+def test_clinical_insights_missing_service_auth_fails_gracefully(app, tmp_path: Path):
+    staging_env = tmp_path / "staging.env"
+    staging_env.write_text(
+        "FRONTEND_URL=https://frontend.example\n"
+        "CORS_ORIGINS=https://frontend.example,https://api.example\n"
+        "APP_ADMIN_USERNAME=app-admin\n"
+        "APP_ADMIN_PASSWORD_HASH=not-a-usable-password\n",
+        encoding="utf-8",
+    )
+    app.config["STAGING_API_ENV_FILE"] = staging_env
+    client = app.test_client()
+    login(client)
+    response = client.get("/clinical-insights/api/overview")
+    assert response.status_code == 503
+    assert b"API-issued bearer token" in response.data
+
+
+def test_every_insights_tab_search_resets_its_own_pagination():
+    script = Path("src/collabvet_review_app/static/clinical_insights.js").read_text(
+        encoding="utf-8"
+    )
+    assert 'input.dataset.searchTab' in script
+    assert 'state.offsets[tab] = 0' in script
+    assert 'data-search-tab="${tab}"' in script
+    assert "previous.abort()" in script
 
 
 def test_external_cases_layout_is_indexed_and_missing_cases_are_removed(app):

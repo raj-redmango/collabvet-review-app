@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Clinical Insights · CollabVet Review{% endblock %}
+{% block content %}
+<div class="page-heading insights-heading">
+  <div>
+    <h1>Clinical Insights</h1>
+    <p>Descriptive analytics from de-identified longitudinal records.</p>
+  </div>
+  <div class="insights-filters">
+    <label>Mining run
+      <select id="insights-run"><option value="">Active/latest run</option></select>
+    </label>
+    <label>Source VB
+      <select id="insights-vb"><option value="">All permitted VBs</option></select>
+    </label>
+  </div>
+</div>
+
+<aside class="clinical-caution">
+  Mined associations are descriptive signals—not confirmed diagnoses, prescriptions,
+  treatment recommendations, or proof of causal treatment effects. Outcome rates use
+  only cases with linked follow-up when the API supplies that denominator.
+</aside>
+
+<section class="panel" aria-labelledby="overview-title">
+  <div class="card-row">
+    <div><h2 id="overview-title">Overview</h2><p class="muted">Case-level counts for the selected run and VB scope.</p></div>
+    <span id="overview-status" class="badge">Loading…</span>
+  </div>
+  <div id="overview-error" class="insights-error" hidden></div>
+  <div id="overview-metrics" class="metric-grid" aria-live="polite"></div>
+  <div id="overview-metadata" class="metadata-strip"></div>
+</section>
+
+<div class="insights-tabs" role="tablist" aria-label="Clinical Insights sections">
+  {% for id, label in [
+    ('patterns', 'Diagnoses and patterns'),
+    ('pathways', 'Diagnosis → treatment'),
+    ('treatments', 'Treatments and outcomes'),
+    ('medications', 'Medications'),
+    ('safety', 'Handling and safety'),
+    ('cases', 'Cases and evidence'),
+    ('knowledge', 'VB Knowledge Base'),
+    ('runs', 'Mining runs')
+  ] %}
+    <button type="button" class="insights-tab{% if loop.first %} active{% endif %}"
+      role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}"
+      data-tab="{{ id }}">{{ label }}</button>
+  {% endfor %}
+</div>
+
+{% for id, label, placeholder in [
+  ('patterns', 'Diagnoses and behavioral patterns', 'Search label, key, type, status, or pattern identifier…'),
+  ('pathways', 'Diagnosis → treatment', 'Search diagnoses, patterns, treatments, or families…'),
+  ('treatments', 'Treatments and observed outcomes', 'Search treatments, families, statuses, or outcomes…'),
+  ('medications', 'Medications', 'Search medication, alias, status, rationale, adverse effect, or outcome…'),
+  ('safety', 'Handling and safety', 'Search safety criterion, status, or evidence…'),
+  ('cases', 'Cases and evidence', 'Search case ID, VB, species, signalment, or review status…'),
+  ('knowledge', 'VB Knowledge Base', 'Search term, alias, category, definition, guidance, or warning…'),
+  ('runs', 'Mining runs', 'Search run, commit, schema, miner, prompt, model, or status…')
+] %}
+<section class="panel insights-panel" data-tab-panel="{{ id }}" {% if not loop.first %}hidden{% endif %}>
+  <div class="card-row"><div><h2>{{ label }}</h2><p class="muted tab-description" data-description="{{ id }}"></p></div></div>
+  <div class="tab-search">
+    <label class="sr-only" for="search-{{ id }}">Search {{ label }}</label>
+    <input id="search-{{ id }}" type="search" placeholder="{{ placeholder }}"
+      data-search-tab="{{ id }}" autocomplete="off">
+    <button type="button" class="secondary" data-clear-tab="{{ id }}">Clear</button>
+  </div>
+  <div class="tab-state" data-tab-state="{{ id }}">Select this tab to load data.</div>
+  <div class="insights-results" data-tab-results="{{ id }}"></div>
+  {% if id in ('pathways', 'treatments', 'cases') %}
+  <div class="pagination" data-pagination="{{ id }}" hidden>
+    <span data-page-summary="{{ id }}"></span>
+    <div><button type="button" class="secondary" data-page-prev="{{ id }}">Previous</button>
+    <button type="button" class="secondary" data-page-next="{{ id }}">Next</button></div>
+  </div>
+  {% endif %}
+</section>
+{% endfor %}
+
+<dialog id="insights-detail" class="insights-dialog">
+  <form method="dialog" class="dialog-heading">
+    <div><h2 id="detail-title">Evidence details</h2><p id="detail-subtitle" class="muted"></p></div>
+    <button type="submit" class="secondary">Close</button>
+  </form>
+  <div class="tab-search">
+    <label class="sr-only" for="detail-search">Search details</label>
+    <input id="detail-search" type="search" placeholder="Search every displayed detail…">
+    <button id="detail-clear" type="button" class="secondary">Clear</button>
+  </div>
+  <div id="detail-state" class="tab-state"></div>
+  <div id="detail-results"></div>
+</dialog>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='clinical_insights.js') }}" defer></script>{% endblock %}
