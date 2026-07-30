@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Data Dashboard · CollabVet Review{% endblock %}
+{% block content %}
+<div id="data-dashboard" data-csrf-token="{{ csrf_token() }}">
+  <div class="page-heading dashboard-heading">
+    <div>
+      <h1>Data Dashboard</h1>
+      <p>Operational visibility from PII-removed source records through review and training readiness.</p>
+    </div>
+    <div class="actions">
+      <span id="dashboard-freshness" class="muted" aria-live="polite">Loading inventory…</span>
+      <button id="dashboard-refresh" type="button" class="secondary">Refresh inventory</button>
+    </div>
+  </div>
+
+  <div class="clinical-caution">
+    <strong>Raw inventory is not connected.</strong>
+    This dashboard never scans <code>raw/</code>. It uses safe file-presence metadata,
+    scrubbed longitudinal metadata, manifests, and local review state.
+  </div>
+
+  <div id="dashboard-alert" class="insights-error" role="alert" hidden></div>
+  <div id="dashboard-warnings" class="dashboard-warnings" hidden></div>
+
+  <section class="panel" aria-labelledby="lifecycle-title">
+    <div class="section-heading">
+      <div>
+        <h2 id="lifecycle-title">Data lifecycle</h2>
+        <p class="muted">Select an available stage to filter the patient explorer.</p>
+      </div>
+      <div id="dashboard-git" class="git-state"></div>
+    </div>
+    <div id="lifecycle-funnel" class="lifecycle-funnel" aria-live="polite"></div>
+    <div id="conversion-strip" class="conversion-strip"></div>
+  </section>
+
+  <div class="dashboard-columns">
+    <section class="panel" aria-labelledby="readiness-title">
+      <h2 id="readiness-title">PII-removed source readiness</h2>
+      <div id="readiness-grid" class="metric-grid"></div>
+    </section>
+    <section class="panel" aria-labelledby="opportunity-title">
+      <h2 id="opportunity-title">Opportunity Queue</h2>
+      <div id="opportunity-grid" class="opportunity-list"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="explorer-title">
+    <div class="section-heading">
+      <div>
+        <h2 id="explorer-title">Patient explorer</h2>
+        <p id="patient-summary" class="muted" aria-live="polite"></p>
+      </div>
+      <button id="clear-patient-filters" type="button" class="secondary">Clear filters</button>
+    </div>
+    <div class="dashboard-filters">
+      <label>
+        Search
+        <input id="patient-search" type="search"
+          placeholder="Pseudonym, case ID, status, model, issue, or next action"
+          autocomplete="off">
+      </label>
+      <label>
+        Pipeline stage
+        <select id="patient-stage">
+          <option value="all">All patients</option>
+          <option value="pii_removed">PII removed</option>
+          <option value="process_ready">Process ready</option>
+          <option value="longitudinal">Longitudinal</option>
+          <option value="legacy_training">Legacy training corpus</option>
+          <option value="new">New longitudinal</option>
+          <option value="awaiting_review">Awaiting clinician review</option>
+          <option value="clinician_approved">Clinician approved</option>
+          <option value="future_training">Future-training eligible</option>
+          <option value="broken">Inventory issues</option>
+          <option value="ready_without_longitudinal">Process ready, not extracted</option>
+          <option value="approved_not_future">Approved, not in future manifest</option>
+        </select>
+      </label>
+      <label>
+        Sort
+        <select id="patient-sort">
+          <option value="pseudonym">Pseudonym A–Z</option>
+          <option value="-pseudonym">Pseudonym Z–A</option>
+          <option value="-visit_count">Most visits</option>
+          <option value="visit_count">Fewest visits</option>
+          <option value="status">Pipeline status</option>
+          <option value="next_action">Next action</option>
+        </select>
+      </label>
+    </div>
+    <div id="patient-state" class="tab-state">Loading patients…</div>
+    <div class="insights-table-wrap">
+      <table class="insights-table dashboard-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>PII-removed source</th>
+            <th>Longitudinal</th>
+            <th>Review</th>
+            <th>Training status</th>
+            <th>Next action</th>
+          </tr>
+        </thead>
+        <tbody id="patient-results"></tbody>
+      </table>
+    </div>
+    <div id="patient-pagination" class="pagination" hidden>
+      <span id="patient-page-summary"></span>
+      <div>
+        <button id="patient-prev" type="button" class="secondary">Previous</button>
+        <button id="patient-next" type="button" class="secondary">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="definitions-title">
+    <details>
+      <summary><strong id="definitions-title">Metric definitions and limitations</strong></summary>
+      <dl id="dashboard-definitions" class="dashboard-definitions"></dl>
+    </details>
+  </section>
+
+  <dialog id="patient-detail" class="insights-dialog">
+    <div class="dialog-heading">
+      <div>
+        <h2 id="patient-detail-title">Patient pipeline</h2>
+        <p id="patient-detail-subtitle" class="muted"></p>
+      </div>
+      <button id="patient-detail-close" type="button" class="secondary">Close</button>
+    </div>
+    <div id="patient-detail-state" class="tab-state"></div>
+    <div id="patient-detail-results"></div>
+  </dialog>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='data_dashboard.js') }}" defer></script>
+{% endblock %}

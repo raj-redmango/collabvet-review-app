@@ -28,7 +28,7 @@
     <h2>Overview</h2>
     {% set sig = case.get("signalment", {}) %}
     <dl>
-      <dt>Patient</dt><dd>{{ sig.get("pet_name", record.patient_folder) }}</dd>
+      <dt>Patient</dt><dd>{{ record.patient_folder }}</dd>
       <dt>Signalment</dt><dd>{{ [sig.get("species"), sig.get("breed"), sig.get("age"), sig.get("sex")]|select|join(", ") }}</dd>
       <dt>Status</dt><dd>{{ record.status|replace("_", " ") }}</dd>
       <dt>Reviewer</dt><dd>{{ record.assigned_user.display_name if record.assigned_user else "Unassigned" }}</dd>

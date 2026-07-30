@@ -22,6 +22,14 @@ from flask import (
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy import or_
 
+from collabvet_review_app.data_dashboard import (
+    DashboardPatientNotFound,
+    DashboardRefreshLimited,
+    dashboard_overview,
+    dashboard_patient,
+    dashboard_patients,
+)
+from collabvet_review_app.insights import InsightsAPIError, clinical_insights_request
 from collabvet_review_app.models import (
     CaseRecord,
     ReviewComment,
@@ -30,7 +38,6 @@ from collabvet_review_app.models import (
     db,
     utcnow,
 )
-from collabvet_review_app.insights import InsightsAPIError, clinical_insights_request
 from collabvet_review_app.security import rate_limit
 from collabvet_review_app.services import (
     add_revision,
@@ -53,16 +60,36 @@ from collabvet_review_app.training.prompts import SYSTEM_BY_STAGE
 bp = Blueprint("review", __name__)
 
 INSIGHTS_RESOURCES = {
-    "overview": "/api/v1/app-admin/clinical-insights/overview",
-    "patterns": "/api/v1/app-admin/clinical-insights/patterns",
-    "pathways": "/api/v1/app-admin/clinical-insights/pathways",
-    "safety": "/api/v1/app-admin/clinical-insights/safety",
-    "interventions": "/api/v1/app-admin/clinical-insights/interventions",
-    "runs": "/api/v1/app-admin/clinical-insights/runs",
-    "cases": "/api/v1/app-admin/clinical-insights/cases",
-    "knowledge": "/api/v1/app-admin/clinical-insights/knowledge",
+    "overview": "/api/v1/review/clinical-insights/overview",
+    "patterns": "/api/v1/review/clinical-insights/patterns",
+    "pathways": "/api/v1/review/clinical-insights/pathways",
+    "safety": "/api/v1/review/clinical-insights/safety",
+    "interventions": "/api/v1/review/clinical-insights/interventions",
+    "runs": "/api/v1/review/clinical-insights/runs",
+    "cases": "/api/v1/review/clinical-insights/cases",
+    "knowledge": "/api/v1/review/clinical-insights/knowledge",
 }
 INSIGHTS_QUERY_KEYS = {"run_id", "vb_id", "offset", "limit", "q"}
+GRAPH_PREFIX = "/api/v1/review/clinical-insights/graph"
+GRAPH_CASE_QUERY_KEYS = {
+    "q",
+    "offset",
+    "limit",
+    "source_vb_id",
+    "mining_run_id",
+    "review_state",
+    "include_quarantined",
+}
+GRAPH_GLOBAL_QUERY_KEYS = {
+    "stage",
+    "source_vb_id",
+    "mining_run_id",
+    "review_state",
+    "include_quarantined",
+    "include_machine_only",
+    "aggregation_level",
+    "max_nodes",
+}
 
 
 @bp.route("/login", methods=["GET", "POST"])
@@ -135,16 +162,92 @@ def clinical_insights():
     return render_template("clinical_insights.html")
 
 
-def _insights_json(path: str):
+@bp.get("/data-dashboard")
+@login_required
+def data_dashboard():
+    return render_template("data_dashboard.html")
+
+
+@bp.get("/data-dashboard/api/overview")
+@login_required
+def data_dashboard_overview():
+    try:
+        return jsonify(dashboard_overview())
+    except RuntimeError as exc:
+        return jsonify({"error": str(exc)}), 503
+
+
+@bp.get("/data-dashboard/api/patients")
+@login_required
+def data_dashboard_patients():
+    offset = request.args.get("offset", default=0, type=int)
+    limit = request.args.get("limit", default=25, type=int)
+    return jsonify(
+        dashboard_patients(
+            query=request.args.get("q", ""),
+            stage=request.args.get("stage", "all"),
+            sort=request.args.get("sort", "pseudonym"),
+            offset=offset if offset is not None else 0,
+            limit=limit if limit is not None else 25,
+        )
+    )
+
+
+@bp.get("/data-dashboard/api/patients/<key>")
+@login_required
+def data_dashboard_patient(key: str):
+    try:
+        return jsonify(dashboard_patient(key))
+    except DashboardPatientNotFound:
+        abort(404)
+
+
+@bp.post("/data-dashboard/api/refresh")
+@login_required
+def data_dashboard_refresh():
+    try:
+        payload = dashboard_overview(force=True)
+    except DashboardRefreshLimited as exc:
+        response = jsonify({"error": str(exc), "retry_after": exc.retry_after})
+        response.status_code = 429
+        response.headers["Retry-After"] = str(exc.retry_after)
+        return response
+    except RuntimeError as exc:
+        return jsonify({"error": str(exc)}), 503
+    audit("data_dashboard_refreshed", user=current_user)
+    return jsonify(payload)
+
+
+def _insights_json(
+    path: str,
+    *,
+    allowed_query_keys: set[str] | None = None,
+    method: str = "GET",
+    body: dict[str, Any] | None = None,
+):
+    allowed_query_keys = allowed_query_keys or INSIGHTS_QUERY_KEYS
     query = {
         key: value
         for key, value in request.args.items()
-        if key in INSIGHTS_QUERY_KEYS and value != ""
+        if key in allowed_query_keys and value != ""
     }
     try:
-        return jsonify(clinical_insights_request(path, query))
+        if method == "GET" and body is None:
+            payload = clinical_insights_request(path, query)
+        else:
+            payload = clinical_insights_request(
+                path,
+                query,
+                method=method,
+                body=body,
+            )
+        return jsonify(payload)
     except InsightsAPIError as exc:
-        return jsonify({"error": str(exc), "status": exc.status}), exc.status
+        response = jsonify({"error": str(exc), "status": exc.status})
+        response.status_code = exc.status
+        if exc.retry_after:
+            response.headers["Retry-After"] = exc.retry_after
+        return response
 
 
 @bp.get("/clinical-insights/api/<resource>")
@@ -169,22 +272,161 @@ def clinical_insights_metric(metric: str):
     }
     if metric not in allowed:
         abort(404)
-    return _insights_json(f"/api/v1/app-admin/clinical-insights/metrics/{metric}")
+    return _insights_json(f"/api/v1/review/clinical-insights/metrics/{metric}")
 
 
 @bp.get("/clinical-insights/api/cases/<case_id>")
 @login_required
 def clinical_insights_case(case_id: str):
     safe_id = urllib.parse.quote(case_id, safe="")
-    return _insights_json(f"/api/v1/app-admin/clinical-insights/cases/{safe_id}")
+    return _insights_json(f"/api/v1/review/clinical-insights/cases/{safe_id}")
 
 
 @bp.get("/clinical-insights/api/pathway-comparisons")
 @login_required
 def clinical_insights_comparisons():
     return _insights_json(
-        "/api/v1/app-admin/clinical-insights/pathway-comparisons"
+        "/api/v1/review/clinical-insights/pathway-comparisons"
     )
+
+
+@bp.get("/clinical-insights/api/graph/summary")
+@login_required
+def clinical_graph_summary():
+    return _insights_json(f"{GRAPH_PREFIX}/summary", allowed_query_keys=set())
+
+
+@bp.get("/clinical-insights/api/graph/vocabulary")
+@login_required
+def clinical_graph_vocabulary():
+    return _insights_json(f"{GRAPH_PREFIX}/vocabulary", allowed_query_keys=set())
+
+
+@bp.get("/clinical-insights/api/graph/cases")
+@login_required
+def clinical_graph_cases():
+    return _insights_json(
+        f"{GRAPH_PREFIX}/cases",
+        allowed_query_keys=GRAPH_CASE_QUERY_KEYS,
+    )
+
+
+@bp.get("/clinical-insights/api/graph/global-graph")
+@login_required
+def clinical_global_graph():
+    return _insights_json(
+        f"{GRAPH_PREFIX}/global-graph",
+        allowed_query_keys=GRAPH_GLOBAL_QUERY_KEYS,
+    )
+
+
+GRAPH_CASE_VIEWS = {
+    "relationships": {"include_quarantined"},
+    "pathway": {"include_quarantined"},
+    "timeline": set(),
+    "review-table": {
+        "q",
+        "offset",
+        "limit",
+        "review_state",
+        "stage",
+        "include_quarantined",
+    },
+    "versions": set(),
+    "history": {"target_kind", "target_key"},
+}
+
+
+@bp.get("/clinical-insights/api/graph/cases/<case_id>/<view>")
+@login_required
+def clinical_graph_case_view(case_id: str, view: str):
+    allowed = GRAPH_CASE_VIEWS.get(view)
+    if allowed is None:
+        abort(404)
+    safe_id = urllib.parse.quote(case_id, safe="")
+    return _insights_json(
+        f"{GRAPH_PREFIX}/cases/{safe_id}/{view}",
+        allowed_query_keys=allowed,
+    )
+
+
+def _validated_graph_review_payload() -> dict[str, Any]:
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        abort(400, "A JSON review decision is required.")
+    allowed_actions = {
+        "confirm",
+        "correct",
+        "mark_uncertain",
+        "request_evidence",
+        "annotate",
+        "retire",
+        "restore",
+    }
+    target_kind = payload.get("target_kind")
+    target_key = payload.get("target_key")
+    action = payload.get("action")
+    if target_kind not in {"node", "edge"}:
+        abort(400, "Invalid review target.")
+    if not isinstance(target_key, str) or not 1 <= len(target_key) <= 300:
+        abort(400, "Invalid review target key.")
+    if action not in allowed_actions:
+        abort(400, "Invalid review action.")
+    cleaned: dict[str, Any] = {
+        "target_kind": target_kind,
+        "target_key": target_key,
+        "action": action,
+    }
+    rationale = payload.get("rationale")
+    if rationale is not None:
+        if not isinstance(rationale, str) or len(rationale) > 2000:
+            abort(400, "Invalid review rationale.")
+        cleaned["rationale"] = rationale.strip()
+    expected_hash = payload.get("expected_payload_hash")
+    if expected_hash is not None:
+        if not isinstance(expected_hash, str) or len(expected_hash) > 256:
+            abort(400, "Invalid expected payload hash.")
+        cleaned["expected_payload_hash"] = expected_hash
+    if action == "annotate":
+        annotation = payload.get("annotation")
+        if not isinstance(annotation, str) or not annotation.strip():
+            abort(400, "An annotation is required.")
+        cleaned["annotation"] = annotation.strip()[:4000]
+    if action == "correct":
+        replacement = payload.get("replacement")
+        field = "headline" if target_kind == "node" else "relationship_label"
+        if (
+            not isinstance(replacement, dict)
+            or not isinstance(replacement.get(field), str)
+            or not replacement[field].strip()
+        ):
+            abort(400, "Corrected wording is required.")
+        cleaned["replacement"] = {field: replacement[field].strip()[:1000]}
+    return cleaned
+
+
+@bp.post("/clinical-insights/api/graph/cases/<case_id>/review")
+@login_required
+def clinical_graph_review(case_id: str):
+    safe_id = urllib.parse.quote(case_id, safe="")
+    payload = _validated_graph_review_payload()
+    response = _insights_json(
+        f"{GRAPH_PREFIX}/cases/{safe_id}/review",
+        allowed_query_keys=set(),
+        method="POST",
+        body=payload,
+    )
+    if response.status_code < 400:
+        audit(
+            "clinical_graph_review_submitted",
+            user=current_user,
+            detail={
+                "case_id": case_id,
+                "target_kind": payload["target_kind"],
+                "action": payload["action"],
+            },
+        )
+    return response
 
 
 def _record_or_404(record_id: int) -> CaseRecord:

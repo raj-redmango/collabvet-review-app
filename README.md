@@ -67,3 +67,6 @@ Access details.
 
 See `docs/clinical_insights.md` for the staging Clinical Insights API contract,
 authentication boundary, source inventory, and currently unavailable API fields.
+
+See `docs/data_dashboard.md` for the local Data Dashboard inventory definitions,
+privacy boundary, training-status semantics, and refresh behavior.

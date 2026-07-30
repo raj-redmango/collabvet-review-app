@@ -41,8 +41,12 @@ class ReviewConfig:
     ).resolve()
     CLINICAL_DATA_REPOSITORY = DEFAULT_CLINICAL_DATA_REPOSITORY
     INPUT_ROOT = (CLINICAL_DATA_ROOT / "cases").resolve()
-    STAGING_API_ENV_FILE = PROJECT_ROOT / "collabvet-staging-api.env"
-    CLINICAL_INSIGHTS_API_TOKEN = ""
+    COLLABVET_API_BASE_URL = os.environ.get("COLLABVET_API_BASE_URL", "").rstrip("/")
+    COLLABVET_REVIEW_CLIENT_ID = os.environ.get("COLLABVET_REVIEW_CLIENT_ID", "")
+    COLLABVET_REVIEW_CLIENT_SECRET = os.environ.get(
+        "COLLABVET_REVIEW_CLIENT_SECRET",
+        "",
+    )
     SOURCE_ROOT = Path(
         os.environ.get("REVIEW_SOURCE_ROOT", DATA_ROOT / "source_documents")
     ).resolve()

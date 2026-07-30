@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Clinical Insights · CollabVet Review{% endblock %}
 {% block content %}
-<div class="page-heading insights-heading">
+<div class="page-heading insights-heading" id="clinical-insights-root"
+  data-csrf-token="{{ csrf_token() }}">
   <div>
     <h1>Clinical Insights</h1>
     <p>Descriptive analytics from de-identified longitudinal records.</p>
@@ -40,6 +41,7 @@
     ('medications', 'Medications'),
     ('safety', 'Handling and safety'),
     ('cases', 'Cases and evidence'),
+    ('graph', 'Case graph'),
     ('knowledge', 'VB Knowledge Base'),
     ('runs', 'Mining runs')
   ] %}
@@ -79,6 +81,121 @@
 </section>
 {% endfor %}
 
+<section class="panel insights-panel graph-panel" data-tab-panel="graph" hidden>
+  <div class="graph-section-heading">
+    <div>
+      <h2>Clinical knowledge graph</h2>
+      <p class="muted">Explore evidence-backed clinical claims and their documented relationships.</p>
+    </div>
+    <div id="graph-summary-badges" class="graph-summary-badges" aria-live="polite"></div>
+  </div>
+
+  <div class="graph-mode-switch" role="tablist" aria-label="Graph scope">
+    <button type="button" class="secondary active" data-graph-mode="case"
+      role="tab" aria-selected="true">Case explorer</button>
+    <button type="button" class="secondary" data-graph-mode="corpus"
+      role="tab" aria-selected="false">Corpus graph</button>
+  </div>
+
+  <div data-graph-mode-panel="case">
+    <div class="graph-case-filters">
+      <label>Find a patient or clinical term
+        <input id="graph-case-search" type="search"
+          placeholder="Patient name, symptom, diagnosis, assessment, treatmentâ€¦">
+      </label>
+      <label>Source VB
+        <select id="graph-vb-filter"><option value="">All source VBs</option></select>
+      </label>
+      <label>Mining run
+        <select id="graph-run-filter"><option value="">All mining runs</option></select>
+      </label>
+      <label>Review status
+        <select id="graph-review-filter">
+          <option value="">All review states</option>
+          <option value="machine_only">Not yet reviewed</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="corrected">Corrected</option>
+          <option value="uncertain">Marked uncertain</option>
+          <option value="needs_evidence">Needs evidence</option>
+          <option value="retired">Retired</option>
+        </select>
+      </label>
+      <label>Page size
+        <select id="graph-page-size">
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+          <option value="50">50</option>
+        </select>
+      </label>
+      <label class="checkbox graph-held-filter">
+        <input id="graph-held-filter" type="checkbox"> Include items held for review
+      </label>
+    </div>
+
+    <div id="graph-case-status" class="tab-state">Select this tab to load the case corpus.</div>
+    <div class="graph-case-workspace">
+      <aside class="graph-case-rail" aria-label="Clinical graph cases">
+        <div class="graph-case-rail-heading">
+          <strong id="graph-case-total">Cases</strong>
+          <button type="button" class="secondary graph-clear-search" id="graph-clear-search">Clear</button>
+        </div>
+        <div id="graph-case-list" class="graph-case-list"></div>
+        <div class="graph-case-pagination">
+          <button type="button" class="secondary" id="graph-case-prev">Previous</button>
+          <span id="graph-case-page"></span>
+          <button type="button" class="secondary" id="graph-case-next">Next</button>
+        </div>
+      </aside>
+
+      <section class="graph-case-main" aria-live="polite">
+        <div id="graph-case-empty" class="graph-empty">
+          Choose a patient case to open its clinical pathway and relationship graph.
+        </div>
+        <div id="graph-case-content" hidden>
+          <header id="graph-case-header" class="graph-case-header"></header>
+          <div class="graph-view-tabs" role="tablist" aria-label="Case graph views">
+            <button type="button" class="secondary active" data-graph-view="overview"
+              role="tab" aria-selected="true">Case overview</button>
+            <button type="button" class="secondary" data-graph-view="pathway"
+              role="tab" aria-selected="false">Clinical pathway</button>
+            <button type="button" class="secondary" data-graph-view="timeline"
+              role="tab" aria-selected="false">Timeline</button>
+            <button type="button" class="secondary" data-graph-view="review"
+              role="tab" aria-selected="false">Review queue</button>
+            <button type="button" class="secondary" data-graph-view="network"
+              role="tab" aria-selected="false">Graph explorer</button>
+          </div>
+          <div id="graph-view-state" class="tab-state"></div>
+          <div id="graph-case-view"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div data-graph-mode-panel="corpus" hidden>
+    <div class="corpus-graph-controls">
+      <label>Maximum concepts
+        <select id="corpus-node-limit">
+          <option value="40">40</option>
+          <option value="80" selected>80</option>
+          <option value="150">150</option>
+        </select>
+      </label>
+      <label class="checkbox"><input id="corpus-machine-only" type="checkbox">
+        Include machine-only knowledge</label>
+      <label class="checkbox"><input id="corpus-held" type="checkbox">
+        Include items held for review</label>
+      <button type="button" class="secondary" id="corpus-refresh">Refresh graph</button>
+    </div>
+    <aside class="clinical-caution graph-caution">
+      Corpus relationships are descriptive. Temporal sequence and mined association do not establish
+      diagnosis, treatment superiority, or causality.
+    </aside>
+    <div id="corpus-graph-state" class="tab-state"></div>
+    <div id="corpus-graph-view"></div>
+  </div>
+</section>
+
 <dialog id="insights-detail" class="insights-dialog">
   <form method="dialog" class="dialog-heading">
     <div><h2 id="detail-title">Evidence details</h2><p id="detail-subtitle" class="muted"></p></div>
@@ -93,4 +210,7 @@
   <div id="detail-results"></div>
 </dialog>
 {% endblock %}
-{% block scripts %}<script src="{{ url_for('static', filename='clinical_insights.js') }}" defer></script>{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='clinical_graph.js') }}" defer></script>
+<script src="{{ url_for('static', filename='clinical_insights.js') }}" defer></script>
+{% endblock %}

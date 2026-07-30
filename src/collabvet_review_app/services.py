@@ -858,10 +858,29 @@ def audit(
     db.session.commit()
 
 
+def source_documents_root() -> Path:
+    """Resolve the configured PII-removed allowlist without ever falling into raw/."""
+
+    clinical_root = Path(current_app.config["CLINICAL_DATA_ROOT"]).resolve()
+    input_root = Path(current_app.config["INPUT_ROOT"]).resolve()
+    canonical_source = (clinical_root / "source").resolve()
+    canonical_cases = (clinical_root / "cases").resolve()
+    configured_source = Path(current_app.config["SOURCE_ROOT"]).resolve()
+    allowed = (
+        canonical_source
+        if input_root == canonical_cases and canonical_source.is_dir()
+        else configured_source
+    )
+    raw_root = (clinical_root / "raw").resolve()
+    if allowed == raw_root or allowed.is_relative_to(raw_root):
+        raise RuntimeError("PII-removed source allowlist cannot resolve inside raw/")
+    return allowed
+
+
 def document_paths(record: CaseRecord) -> dict[str, Path]:
     data = source_case(record)
     raw = ((data.get("source") or {}).get("input_paths") or {})
-    allowed = Path(current_app.config["SOURCE_ROOT"]).resolve()
+    allowed = source_documents_root()
     result: dict[str, Path] = {}
     aliases = {
         "history": ("history_form", "history_form_path"),
@@ -881,23 +900,39 @@ def document_paths(record: CaseRecord) -> dict[str, Path]:
                     result[key] = path
             if any(key == kind or key.startswith(f"{kind}_") for key in result):
                 break
-    if not result:
-        patient_root = (allowed / record.patient_folder).resolve()
+    history = data.get("history_form") if isinstance(data.get("history_form"), dict) else {}
+    patient_folders = [
+        record.patient_folder,
+        str(history.get("patient_folder") or ""),
+        str(data.get("patient_folder") or ""),
+    ]
+    for patient_folder in dict.fromkeys(value for value in patient_folders if value):
+        patient_root = (allowed / patient_folder).resolve()
         if patient_root.is_dir() and patient_root.is_relative_to(allowed):
-            history = patient_root / "history_form.json"
-            if history.is_file():
-                result["history"] = history
+            history_json = patient_root / "history_form.json"
+            if "history" not in result and history_json.is_file():
+                result["history"] = history_json
             pdfs = sorted(patient_root.glob("*.pdf"))
-            clinical = next(
-                (path for path in pdfs if "clinical" in path.name.lower()),
-                None,
-            )
-            if clinical is not None:
-                result["clinical_summary"] = clinical
-            medfiles = [path for path in pdfs if path != clinical]
+            if "history" not in result:
+                history_pdf = next(
+                    (path for path in pdfs if "history" in path.name.lower()),
+                    None,
+                )
+                if history_pdf is not None:
+                    result["history"] = history_pdf
+            if "clinical_summary" not in result:
+                clinical = next(
+                    (path for path in pdfs if "clinical" in path.name.lower()),
+                    None,
+                )
+                if clinical is not None:
+                    result["clinical_summary"] = clinical
+            medfiles = [path for path in pdfs if "medfiles" in path.name.lower()]
             for index, path in enumerate(medfiles):
                 key = "medfiles" if index == 0 else f"medfiles_{index + 1}"
-                result[key] = path
+                result.setdefault(key, path)
+            if {"history", "clinical_summary", "medfiles"}.issubset(result):
+                break
     return result
 
 
