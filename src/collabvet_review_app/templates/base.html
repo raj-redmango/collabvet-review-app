@@ -14,6 +14,7 @@
         <a href="{{ url_for('review.queue') }}">Review queue</a>
         <a href="{{ url_for('review.data_dashboard') }}">Data Dashboard</a>
         <a href="{{ url_for('review.clinical_insights') }}">Clinical Insights</a>
+        <a href="{{ url_for('review.clinical_insights') }}?tab=graph">Graph Explorer</a>
       </nav>
       <span>{{ current_user.display_name }}</span>
       <form method="post" action="{{ url_for('review.logout') }}">

@@ -232,6 +232,7 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
         assert f'data-clear-tab="{tab}"'.encode() in response.data
     assert b'id="graph-case-search"' in response.data
     assert b'id="graph-clear-search"' in response.data
+    assert b'href="/clinical-insights?tab=graph">Graph Explorer</a>' in response.data
 
 
 def test_clinical_insights_proxy_preserves_filters_and_rejects_unknowns(app, monkeypatch):

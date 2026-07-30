@@ -284,5 +284,7 @@
   document.getElementById("detail-search").addEventListener("input", (event) => { state.detailSearch = event.target.value; renderDetail(); });
   document.getElementById("detail-clear").addEventListener("click", () => { state.detailSearch = ""; document.getElementById("detail-search").value = ""; renderDetail(); });
 
+  const requestedTab = new URLSearchParams(window.location.search).get("tab");
+  if (requestedTab && tabs.includes(requestedTab)) activateTab(requestedTab);
   loadOverview();
 })();
