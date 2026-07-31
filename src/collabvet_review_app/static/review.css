@@ -532,7 +532,7 @@ pre.preview { overflow: auto; white-space: pre-wrap; }
 #review-graph-arrow path { fill: #819a93; }
 .network-edge line.network-edge-hit {
   stroke: transparent;
-  stroke-width: 14;
+  stroke-width: 20;
   pointer-events: stroke;
   cursor: pointer;
 }

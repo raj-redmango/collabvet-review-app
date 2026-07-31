@@ -337,11 +337,11 @@
         shortLabel.textContent = truncate(node.raw.headline, 28);
         group.append(shortLabel);
         group.addEventListener("click", () => {
-          if (!node.patient) this.select("node", node);
+          this.select(node.patient ? "patient" : "node", node);
         });
         group.addEventListener("keydown", (event) => {
-          if (!node.patient && (event.key === "Enter" || event.key === " ")) {
-            this.select("node", node);
+          if (event.key === "Enter" || event.key === " ") {
+            this.select(node.patient ? "patient" : "node", node);
           }
         });
         group.addEventListener("pointerdown", (event) => {
@@ -863,13 +863,15 @@
           <div class="graph-inspector-empty">Select a clinical claim or relationship to inspect its evidence and review state.</div>
         </aside>
       </div>`;
-    new ClinicalNetwork(document.getElementById("case-network-host"), {
+    const network = new ClinicalNetwork(document.getElementById("case-network-host"), {
       nodes,
       edges,
       patient: payload.graph,
       projectionSource: payload.projection_source,
       onSelect: (kind, item) => showInspector(kind, item, document.getElementById("graph-inspector"))
     });
+    const initialNode = network.nodes.find((node) => !node.patient);
+    if (initialNode) network.select("node", initialNode);
     bindViewSearch("network", renderNetwork);
   }
 
@@ -886,6 +888,25 @@
       }
       inspector = dialog.querySelector(".graph-inspector");
       dialog.showModal();
+    }
+    if (kind === "patient") {
+      const context = state.selectedCase || {};
+      inspector.innerHTML = `
+        <div class="inspector-heading">
+          <span class="graph-eyebrow">Patient context</span>
+          <h3>${esc(context.patient_display_name || item.patient_display_name || item.headline || "Patient name not linked")}</h3>
+          <div>${badge(context.review_status || item.review_status || "Case context")}</div>
+        </div>
+        <p class="inspector-explanation">This anchor identifies the patient case represented by the surrounding clinical claims.</p>
+        <dl>
+          <dt>Case</dt><dd>${esc(context.case_id || item.case_id || "Not reported")}</dd>
+          <dt>Species</dt><dd>${esc(context.species || item.species || "Not reported")}</dd>
+          <dt>Identity</dt><dd>${esc(words(context.identity_mapping_status || item.identity_mapping_status || "Not linked"))}</dd>
+          <dt>Source VB</dt><dd>${esc(context.source_vb?.display_name || item.source_vb?.display_name || "Not reported")}</dd>
+          <dt>Date range</dt><dd>${esc(context.first_event_date || item.first_event_date || "Unknown")} → ${esc(context.last_event_date || item.last_event_date || "Unknown")}</dd>
+        </dl>
+        <p class="inspector-note">The patient anchor provides context only. Review actions apply to individual clinical claims and relationships.</p>`;
+      return;
     }
     const isNode = kind === "node";
     const nodes = array(state.relationships?.nodes);
