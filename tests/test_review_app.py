@@ -248,7 +248,10 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
     assert b">Corpus Graph</strong>" in response.data
     assert b"scope=corpus" in response.data
 
-    assert client.get("/graph-explorer?scope=patient").status_code == 200
+    patient_graph = client.get("/graph-explorer?scope=patient")
+    assert patient_graph.status_code == 200
+    assert b'id="clinical-graph-root"' in patient_graph.data
+    assert b'static/clinical_graph.js' in patient_graph.data
     assert client.get("/graph-explorer?scope=corpus").status_code == 200
 
 
@@ -424,6 +427,7 @@ def test_graph_frontend_is_api_only_and_has_clinical_interactions():
     ):
         assert marker in template
     for behavior in (
+        'document.getElementById("clinical-graph-root")',
         "projectionLabel",
         "is_temporal_only",
         "requestFullscreen",

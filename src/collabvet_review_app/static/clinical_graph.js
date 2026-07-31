@@ -1,7 +1,8 @@
 "use strict";
 
 (() => {
-  const root = document.getElementById("clinical-insights-root");
+  const root = document.getElementById("clinical-graph-root") ||
+    document.getElementById("clinical-insights-root");
   if (!root) return;
 
   const esc = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({
