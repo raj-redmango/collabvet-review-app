@@ -45,15 +45,21 @@
     </section>
   </div>
 
-  <section class="panel" aria-labelledby="ledger-title">
-    <div class="section-heading">
+  <details class="panel dashboard-ledger" id="patient-ledger">
+    <summary class="ledger-disclosure">
       <div>
+        <span class="ledger-eyebrow">Records behind these metrics</span>
         <h2 id="ledger-title">Patient data ledger</h2>
         <p class="muted">Pseudonymized pipeline inventory and processing status—not clinical patient insights.</p>
         <p id="patient-summary" class="muted" aria-live="polite"></p>
       </div>
-      <button id="clear-patient-filters" type="button" class="secondary">Clear filters</button>
-    </div>
+      <span class="ledger-toggle-label" aria-hidden="true"></span>
+    </summary>
+    <div class="ledger-body">
+      <div class="section-heading ledger-actions">
+        <p class="muted">Search or filter the records contributing to dashboard counts.</p>
+        <button id="clear-patient-filters" type="button" class="secondary">Clear filters</button>
+      </div>
     <div class="dashboard-filters">
       <label>
         Search
@@ -113,7 +119,8 @@
         <button id="patient-next" type="button" class="secondary">Next</button>
       </div>
     </div>
-  </section>
+    </div>
+  </details>
 
   <section class="panel" aria-labelledby="definitions-title">
     <details>

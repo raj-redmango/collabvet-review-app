@@ -124,15 +124,16 @@
           <option value="150">150</option>
         </select>
       </label>
-      <label class="checkbox"><input id="corpus-machine-only" type="checkbox">
-        Include machine-only knowledge</label>
+      <label class="checkbox"><input id="corpus-machine-only" type="checkbox" checked>
+        Include mined knowledge awaiting review</label>
       <label class="checkbox"><input id="corpus-held" type="checkbox">
         Include items held for review</label>
       <button type="button" class="secondary" id="corpus-refresh">Refresh graph</button>
     </div>
     <aside class="clinical-caution graph-caution">
       Corpus relationships are descriptive. Temporal sequence and mined association do not establish
-      diagnosis, treatment superiority, or causality.
+      diagnosis, treatment superiority, or causality. Mined knowledge awaiting review is included by
+      default because the current corpus has not yet completed clinician review.
     </aside>
     <div id="corpus-graph-state" class="tab-state"></div>
     <div id="corpus-graph-view"></div>

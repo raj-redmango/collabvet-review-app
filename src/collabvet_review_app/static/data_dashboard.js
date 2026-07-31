@@ -76,6 +76,7 @@
     state.stage = stage;
     state.offset = 0;
     document.getElementById("patient-stage").value = stage;
+    document.getElementById("patient-ledger").open = true;
     loadPatients();
     document.getElementById("ledger-title").scrollIntoView({behavior: "smooth", block: "start"});
   }

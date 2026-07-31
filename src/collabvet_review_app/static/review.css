@@ -739,6 +739,42 @@ pre.preview { overflow: auto; white-space: pre-wrap; }
 .dashboard-table td:nth-child(2) { min-width: 250px; }
 .dashboard-table td:last-child { min-width: 210px; }
 .dashboard-definitions { grid-template-columns: minmax(170px, 240px) 1fr; margin-top: 18px; }
+.dashboard-ledger { padding: 0; overflow: visible; }
+.dashboard-ledger:not([open]) > .ledger-body { display: none; }
+.ledger-disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.ledger-disclosure::-webkit-details-marker { display: none; }
+.ledger-disclosure h2 { margin: 2px 0 4px; }
+.ledger-disclosure p { margin: 2px 0 0; }
+.ledger-eyebrow {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.ledger-toggle-label {
+  flex: 0 0 auto;
+  border-radius: 7px;
+  padding: 8px 11px;
+  color: #155f51;
+  background: #e4f2ee;
+  font-size: 13px;
+  font-weight: 750;
+}
+.ledger-toggle-label::after { content: "View records"; }
+.dashboard-ledger[open] .ledger-toggle-label::after { content: "Hide records"; }
+.dashboard-ledger[open] .ledger-disclosure { border-bottom: 1px solid var(--line); }
+.ledger-body { padding: 18px 20px 20px; }
+.ledger-actions { margin-bottom: 8px; }
+.ledger-actions p { margin: 0; }
 .patient-pipeline { margin-top: 16px; }
 .patient-pipeline article {
   position: relative;

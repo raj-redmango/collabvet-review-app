@@ -252,7 +252,9 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
     assert patient_graph.status_code == 200
     assert b'id="clinical-graph-root"' in patient_graph.data
     assert b'static/clinical_graph.js' in patient_graph.data
-    assert client.get("/graph-explorer?scope=corpus").status_code == 200
+    corpus_graph = client.get("/graph-explorer?scope=corpus")
+    assert corpus_graph.status_code == 200
+    assert b'id="corpus-machine-only" type="checkbox" checked' in corpus_graph.data
 
 
 def test_clinical_insights_proxy_preserves_filters_and_rejects_unknowns(app, monkeypatch):
@@ -1245,6 +1247,8 @@ def test_data_dashboard_routes_auth_refresh_and_page_controls(app, tmp_path: Pat
         b"Data Dashboard",
         b"Raw inventory is not connected",
         b"Patient data ledger",
+        b'id="patient-ledger"',
+        b"Records behind these metrics",
         b"not clinical patient insights",
         b'id="patient-search"',
         b'id="patient-stage"',
@@ -1253,6 +1257,10 @@ def test_data_dashboard_routes_auth_refresh_and_page_controls(app, tmp_path: Pat
         b"data_dashboard.js",
     ):
         assert marker in page.data
+    dashboard_script = Path(
+        "src/collabvet_review_app/static/data_dashboard.js"
+    ).read_text(encoding="utf-8")
+    assert 'document.getElementById("patient-ledger").open = true' in dashboard_script
     overview = client.get("/data-dashboard/api/overview")
     assert overview.status_code == 200
     patients = client.get(
