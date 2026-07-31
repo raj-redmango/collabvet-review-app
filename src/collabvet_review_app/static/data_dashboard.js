@@ -77,7 +77,7 @@
     state.offset = 0;
     document.getElementById("patient-stage").value = stage;
     loadPatients();
-    document.getElementById("explorer-title").scrollIntoView({behavior: "smooth", block: "start"});
+    document.getElementById("ledger-title").scrollIntoView({behavior: "smooth", block: "start"});
   }
 
   function renderLifecycle(metrics) {

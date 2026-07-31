@@ -1240,6 +1240,8 @@ def test_data_dashboard_routes_auth_refresh_and_page_controls(app, tmp_path: Pat
     for marker in (
         b"Data Dashboard",
         b"Raw inventory is not connected",
+        b"Patient data ledger",
+        b"not clinical patient insights",
         b'id="patient-search"',
         b'id="patient-stage"',
         b'id="patient-sort"',
