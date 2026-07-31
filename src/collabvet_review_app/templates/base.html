@@ -11,10 +11,13 @@
     <a class="brand" href="{{ url_for('review.queue') }}">CollabVet Clinician Review</a>
     {% if current_user.is_authenticated %}
       <nav class="topnav" aria-label="Primary navigation">
+        <span class="topnav-scope">Patient</span>
         <a href="{{ url_for('review.queue') }}">Review queue</a>
+        <a href="{{ url_for('review.clinical_insights', tab='graph', scope='patient') }}">Patient Explorer</a>
+        <span class="topnav-scope">Corpus</span>
         <a href="{{ url_for('review.data_dashboard') }}">Data Dashboard</a>
         <a href="{{ url_for('review.clinical_insights') }}">Clinical Insights</a>
-        <a href="{{ url_for('review.clinical_insights') }}?tab=graph">Graph Explorer</a>
+        <a href="{{ url_for('review.clinical_insights', tab='graph', scope='corpus') }}">Corpus Graph</a>
       </nav>
       <span>{{ current_user.display_name }}</span>
       <form method="post" action="{{ url_for('review.logout') }}">

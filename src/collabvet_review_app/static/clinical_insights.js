@@ -284,7 +284,17 @@
   document.getElementById("detail-search").addEventListener("input", (event) => { state.detailSearch = event.target.value; renderDetail(); });
   document.getElementById("detail-clear").addEventListener("click", () => { state.detailSearch = ""; document.getElementById("detail-search").value = ""; renderDetail(); });
 
-  const requestedTab = new URLSearchParams(window.location.search).get("tab");
+  const pageParams = new URLSearchParams(window.location.search);
+  const requestedTab = pageParams.get("tab");
+  const requestedCase = pageParams.get("patient") || pageParams.get("case");
+  const scopeContext = document.getElementById("insights-scope-context");
+  if (requestedCase) {
+    scopeContext.innerHTML = `<strong>Patient workspace</strong><span>Insights and graph context for ${escapeHTML(requestedCase)}.</span>`;
+  } else if (pageParams.get("scope") === "patient") {
+    scopeContext.innerHTML = "<strong>Patient workspace</strong><span>Select a patient to explore their overview, pathway, timeline, review queue, and graph.</span>";
+  } else if (pageParams.get("scope") === "corpus") {
+    scopeContext.innerHTML = "<strong>Corpus workspace</strong><span>Cross-case graph projection and aggregate clinical relationships.</span>";
+  }
   if (requestedTab && tabs.includes(requestedTab)) activateTab(requestedTab);
   loadOverview();
 })();

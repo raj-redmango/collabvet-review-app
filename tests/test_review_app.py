@@ -232,7 +232,10 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
         assert f'data-clear-tab="{tab}"'.encode() in response.data
     assert b'id="graph-case-search"' in response.data
     assert b'id="graph-clear-search"' in response.data
-    assert b'href="/clinical-insights?tab=graph">Graph Explorer</a>' in response.data
+    assert b"Patient Explorer</a>" in response.data
+    assert b"scope=patient" in response.data
+    assert b"Corpus Graph</a>" in response.data
+    assert b"scope=corpus" in response.data
 
 
 def test_clinical_insights_proxy_preserves_filters_and_rejects_unknowns(app, monkeypatch):
@@ -687,6 +690,9 @@ def test_case_detail_uses_full_review_identity_not_signalment_first_name(app):
     assert response.status_code == 200
     assert b"<dt>Patient</dt><dd>Synthetic One</dd>" in response.data
     assert b"<dt>Patient</dt><dd>Demo</dd>" not in response.data
+    assert b"Patient workspace" in response.data
+    assert b"Timeline &amp; review" in response.data
+    assert b"Training verification" in response.data
 
 
 def test_external_checkout_origin_is_verified(app, tmp_path: Path, monkeypatch):

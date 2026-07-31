@@ -449,7 +449,8 @@
     relationships: null,
     viewCache: new Map(),
     viewSearch: {pathway: "", timeline: "", review: "", network: ""},
-    caseController: null
+    caseController: null,
+    requestedView: "overview"
   };
 
   function setState(id, message, error = false) {
@@ -473,6 +474,20 @@
       state.vocabulary = vocabulary;
       renderSummary();
       populateFilters(overview, runs);
+      const pageParams = new URLSearchParams(window.location.search);
+      const requestedCase = pageParams.get("patient") || pageParams.get("case");
+      const requestedScope = pageParams.get("scope");
+      const requestedView = pageParams.get("view");
+      if (["overview", "pathway", "timeline", "review", "network"].includes(requestedView)) {
+        state.requestedView = requestedView;
+      }
+      if (requestedCase) {
+        document.getElementById("graph-case-search").value = requestedCase;
+      }
+      if (requestedScope === "corpus") {
+        switchMode("corpus");
+        return;
+      }
       await loadCases();
     } catch (error) {
       setState("graph-case-status", error.message, true);
@@ -570,13 +585,13 @@
 
   async function selectCase(item) {
     state.selectedCase = item;
-    state.activeView = "overview";
+    state.activeView = state.requestedView;
     state.viewCache.clear();
     renderCases();
     document.getElementById("graph-case-empty").hidden = true;
     document.getElementById("graph-case-content").hidden = false;
     document.querySelectorAll("[data-graph-view]").forEach((button) => {
-      const active = button.dataset.graphView === "overview";
+      const active = button.dataset.graphView === state.activeView;
       button.classList.toggle("active", active);
       button.setAttribute("aria-selected", String(active));
     });
@@ -1007,6 +1022,7 @@
 
   function activateView(view) {
     state.activeView = view;
+    state.requestedView = view;
     document.querySelectorAll("[data-graph-view]").forEach((button) => {
       const active = button.dataset.graphView === view;
       button.classList.toggle("active", active);

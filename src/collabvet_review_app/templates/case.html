@@ -23,7 +23,14 @@
   </div>
 </div>
 
-<div class="summary-grid">
+<nav class="patient-workspace-nav" aria-label="Patient workspace">
+  <span class="patient-workspace-label">Patient workspace</span>
+  <a href="#patient-overview">Overview</a>
+  <a href="#patient-timeline">Timeline &amp; review</a>
+  <a href="#patient-training">Training verification</a>
+</nav>
+
+<div class="summary-grid" id="patient-overview">
   <section class="panel">
     <h2>Overview</h2>
     {% set sig = case.get("signalment", {}) %}
@@ -53,7 +60,7 @@
   </section>
 </div>
 
-<section class="panel">
+<section class="panel" id="patient-timeline">
   {% set approved_events = timeline|selectattr("status", "equalto", "approved")|list|length %}
   <div class="card-row">
     <div>
@@ -108,7 +115,7 @@
   </ol>
 </section>
 
-<section class="panel">
+<section class="panel" id="patient-training">
   <h2>Training-stage verification</h2>
   <p>After the timeline is correct, verify the exact system instruction, model input, and expected output for every applicable stage.</p>
   <div class="section-list">
