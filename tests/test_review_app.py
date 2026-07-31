@@ -215,9 +215,12 @@ def test_login_headers_queue_and_audit(app):
 def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
     client = app.test_client()
     assert client.get("/clinical-insights").status_code == 302
+    assert client.get("/graph-explorer?scope=patient").status_code == 302
     login(client)
     response = client.get("/clinical-insights")
     assert response.status_code == 200
+    assert b'data-tab="graph"' not in response.data
+    assert b'id="graph-case-search"' not in response.data
     for tab in (
         "patterns",
         "pathways",
@@ -230,12 +233,13 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
     ):
         assert f'data-search-tab="{tab}"'.encode() in response.data
         assert f'data-clear-tab="{tab}"'.encode() in response.data
-    assert b'id="graph-case-search"' in response.data
-    assert b'id="graph-clear-search"' in response.data
     assert b"Patient Explorer</a>" in response.data
     assert b"scope=patient" in response.data
     assert b"Corpus Graph</a>" in response.data
     assert b"scope=corpus" in response.data
+
+    assert client.get("/graph-explorer?scope=patient").status_code == 200
+    assert client.get("/graph-explorer?scope=corpus").status_code == 200
 
 
 def test_clinical_insights_proxy_preserves_filters_and_rejects_unknowns(app, monkeypatch):
@@ -397,7 +401,7 @@ def test_graph_frontend_is_api_only_and_has_clinical_interactions():
         "src/collabvet_review_app/static/clinical_graph.js"
     ).read_text(encoding="utf-8")
     template = Path(
-        "src/collabvet_review_app/templates/clinical_insights.html"
+        "src/collabvet_review_app/templates/graph_explorer.html"
     ).read_text(encoding="utf-8")
 
     for marker in (
@@ -406,7 +410,7 @@ def test_graph_frontend_is_api_only_and_has_clinical_interactions():
         "data-graph-view=\"timeline\"",
         "data-graph-view=\"review\"",
         "data-graph-view=\"network\"",
-        "data-graph-mode=\"corpus\"",
+        "data-graph-mode-panel=\"corpus\"",
     ):
         assert marker in template
     for behavior in (

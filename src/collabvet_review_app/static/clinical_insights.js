@@ -4,7 +4,7 @@
   const root = document.getElementById("overview-metrics");
   if (!root) return;
 
-  const tabs = ["patterns", "pathways", "treatments", "medications", "safety", "cases", "graph", "knowledge", "runs"];
+  const tabs = ["patterns", "pathways", "treatments", "medications", "safety", "cases", "knowledge", "runs"];
   const descriptions = {
     patterns: "Documented diagnoses remain distinct from documented behavioral patterns and differentials considered.",
     pathways: "Treatment links are descriptive. Differences between cases do not establish why a treatment was selected.",
@@ -12,7 +12,6 @@
     medications: "Explicit attribution is shown separately from temporal association whenever the API provides it.",
     safety: "Safety is presented as documented criteria and evidence—not an unexplained risk score.",
     cases: "Only de-identified, derived evidence permitted by the API is displayed.",
-    graph: "Clinician-friendly pathways, timelines, review state, and the API-provided graph projection.",
     knowledge: "Read-only VB-maintained knowledge shared with Collab.Vet.",
     runs: "Mining runs are immutable and versioned by source, schema, miner, prompt, and model."
   };

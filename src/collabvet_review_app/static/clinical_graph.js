@@ -1138,4 +1138,5 @@
 
   bind();
   window.CollabVetClinicalGraph = {activate: bootstrap};
+  if (document.getElementById("clinical-graph-root")) bootstrap();
 })();

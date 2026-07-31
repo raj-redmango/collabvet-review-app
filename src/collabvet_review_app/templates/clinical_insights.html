@@ -41,7 +41,6 @@
 <div class="insights-tabs" role="tablist" aria-label="Clinical Insights sections">
   {% for id, label in [
     ('patterns', 'Diagnoses and patterns'),
-    ('graph', 'Graph Explorer'),
     ('pathways', 'Diagnosis → treatment'),
     ('treatments', 'Treatments and outcomes'),
     ('medications', 'Medications'),
@@ -86,6 +85,7 @@
 </section>
 {% endfor %}
 
+{% if include_legacy_graph %}
 <section class="panel insights-panel graph-panel" data-tab-panel="graph" hidden>
   <div class="graph-section-heading">
     <div>
@@ -200,6 +200,7 @@
     <div id="corpus-graph-view"></div>
   </div>
 </section>
+{% endif %}
 
 <dialog id="insights-detail" class="insights-dialog">
   <form method="dialog" class="dialog-heading">
@@ -216,6 +217,5 @@
 </dialog>
 {% endblock %}
 {% block scripts %}
-<script src="{{ url_for('static', filename='clinical_graph.js') }}" defer></script>
 <script src="{{ url_for('static', filename='clinical_insights.js') }}" defer></script>
 {% endblock %}

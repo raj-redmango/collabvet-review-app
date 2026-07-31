@@ -162,6 +162,13 @@ def clinical_insights():
     return render_template("clinical_insights.html")
 
 
+@bp.get("/graph-explorer")
+@login_required
+def graph_explorer():
+    scope = "corpus" if request.args.get("scope") == "corpus" else "patient"
+    return render_template("graph_explorer.html", graph_scope=scope)
+
+
 @bp.get("/data-dashboard")
 @login_required
 def data_dashboard():
