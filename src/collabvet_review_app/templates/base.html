@@ -11,19 +11,57 @@
     <a class="brand" href="{{ url_for('review.queue') }}">CollabVet Clinician Review</a>
     {% if current_user.is_authenticated %}
       <nav class="topnav" aria-label="Primary navigation">
-        <span class="topnav-scope">Patient</span>
-        <a href="{{ url_for('review.queue') }}">Review queue</a>
-        <a href="{{ url_for('review.graph_explorer', scope='patient') }}">Patient Explorer</a>
-        <span class="topnav-scope">Corpus</span>
-        <a href="{{ url_for('review.data_dashboard') }}">Data Dashboard</a>
-        <a href="{{ url_for('review.clinical_insights') }}">Clinical Insights</a>
-        <a href="{{ url_for('review.graph_explorer', scope='corpus') }}">Corpus Graph</a>
+        <details class="nav-menu">
+          <summary>Patient</summary>
+          <div class="nav-menu-panel">
+            <a href="{{ url_for('review.queue') }}">
+              <strong>Review queue</strong>
+              <span>Review longitudinal records and training stages</span>
+            </a>
+            <a href="{{ url_for('review.graph_explorer', scope='patient') }}">
+              <strong>Patient Explorer</strong>
+              <span>Explore one patient’s pathway, evidence, and graph</span>
+            </a>
+          </div>
+        </details>
+        <details class="nav-menu">
+          <summary>Corpus</summary>
+          <div class="nav-menu-panel">
+            <a href="{{ url_for('review.data_dashboard') }}">
+              <strong>Data Dashboard</strong>
+              <span>Track source readiness and longitudinal coverage</span>
+            </a>
+            <a href="{{ url_for('review.clinical_insights') }}">
+              <strong>Clinical Insights</strong>
+              <span>Analyze descriptive trends across the corpus</span>
+            </a>
+            <a href="{{ url_for('review.graph_explorer', scope='corpus') }}">
+              <strong>Corpus Graph</strong>
+              <span>Explore aggregate clinical relationships</span>
+            </a>
+          </div>
+        </details>
       </nav>
-      <span>{{ current_user.display_name }}</span>
-      <form method="post" action="{{ url_for('review.logout') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="link-button" type="submit">Sign out</button>
-      </form>
+      <details class="account-menu">
+        <summary>
+          <span class="account-avatar" aria-hidden="true">{{ current_user.display_name[:1]|upper }}</span>
+          <span class="account-summary">
+            <strong>{{ current_user.display_name }}</strong>
+            <small>Account</small>
+          </span>
+        </summary>
+        <div class="account-menu-panel">
+          <div class="account-identity">
+            <strong>{{ current_user.display_name }}</strong>
+            <span>{{ current_user.email }}</span>
+            <span class="account-role">{{ current_user.role|replace('_', ' ')|title }}</span>
+          </div>
+          <form method="post" action="{{ url_for('review.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="account-signout" type="submit">Sign out</button>
+          </form>
+        </div>
+      </details>
     {% endif %}
   </header>
   <main>

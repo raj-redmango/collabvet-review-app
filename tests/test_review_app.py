@@ -206,6 +206,16 @@ def test_login_headers_queue_and_audit(app):
     response = login(client)
     assert response.status_code == 200
     assert b"Synthetic One" in response.data
+    assert response.data.count(b'class="nav-menu"') == 2
+    assert b"<summary>Patient</summary>" in response.data
+    assert b"<summary>Corpus</summary>" in response.data
+    assert b'class="account-menu"' in response.data
+    assert b'class="account-signout"' in response.data
+    navigation_script = Path(
+        "src/collabvet_review_app/static/review.js"
+    ).read_text(encoding="utf-8")
+    assert 'document.querySelectorAll(".topbar details")' in navigation_script
+    assert 'event.key !== "Escape"' in navigation_script
     assert response.headers["Cache-Control"].startswith("no-store")
     assert "default-src 'self'" in response.headers["Content-Security-Policy"]
     with app.app_context():
@@ -233,9 +243,9 @@ def test_clinical_insights_is_authenticated_and_has_bound_searches(app):
     ):
         assert f'data-search-tab="{tab}"'.encode() in response.data
         assert f'data-clear-tab="{tab}"'.encode() in response.data
-    assert b"Patient Explorer</a>" in response.data
+    assert b">Patient Explorer</strong>" in response.data
     assert b"scope=patient" in response.data
-    assert b"Corpus Graph</a>" in response.data
+    assert b">Corpus Graph</strong>" in response.data
     assert b"scope=corpus" in response.data
 
     assert client.get("/graph-explorer?scope=patient").status_code == 200

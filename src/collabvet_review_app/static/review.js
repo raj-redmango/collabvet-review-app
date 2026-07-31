@@ -32,3 +32,21 @@ document.querySelectorAll("[data-timeline-filter]").forEach((button) => {
     });
   });
 });
+
+const headerMenus = [...document.querySelectorAll(".topbar details")];
+headerMenus.forEach((menu) => {
+  menu.addEventListener("toggle", () => {
+    if (!menu.open) return;
+    headerMenus.forEach((other) => {
+      if (other !== menu) other.open = false;
+    });
+  });
+});
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".topbar details")) return;
+  headerMenus.forEach((menu) => { menu.open = false; });
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  headerMenus.forEach((menu) => { menu.open = false; });
+});
